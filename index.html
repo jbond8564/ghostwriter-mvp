@@ -1,3 +1,331 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GhostWriter Social</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: #f9fafb;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #9ca3af;
+      font-size: 15px;
+    }
+
+    .badge {
+      font-size: 12px;
+      color: #111827;
+      background: #93c5fd;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr;
+      margin-bottom: 18px;
+    }
+
+    @media (min-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      color: #d1d5db;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    button {
+      border-radius: 12px;
+      border: 1px solid #4b5563;
+      font-size: 16px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 14px;
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    button {
+      padding: 14px 18px;
+      background: #f9fafb;
+      color: #111827;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .status {
+      min-height: 24px;
+      margin: 14px 0 4px;
+      color: #93c5fd;
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .secondary-btn {
+      background: transparent;
+      color: #f9fafb;
+      border: 1px solid #4b5563;
+    }
+
+    .results {
+      margin-top: 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .post-card {
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .post-text {
+      margin: 0 0 14px;
+      line-height: 1.5;
+      color: #f3f4f6;
+    }
+
+    .copy-btn {
+      background: transparent;
+      color: #f9fafb;
+      border: 1px solid #4b5563;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .copy-btn:hover,
+    .secondary-btn:hover {
+      background: #1f2937;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header-row">
+        <div>
+          <h1>GhostWriter Social</h1>
+          <p class="subtitle">Generate bar, food, and event promos in seconds.</p>
+        </div>
+        <div class="badge">MVP</div>
+      </div>
+
+      <div class="grid">
+        <div class="field full">
+          <label for="topic">Topic</label>
+          <input id="topic" type="text" placeholder="Spicy margarita, taco night, live DJ event" />
+        </div>
+
+        <div class="field">
+          <label for="tone">Tone</label>
+          <select id="tone">
+            <option value="funny">Funny</option>
+            <option value="edgy">Edgy</option>
+            <option value="professional">Professional</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="type">Content Type</label>
+          <select id="type">
+            <option value="drink">Drink Promo</option>
+            <option value="food">Food Special</option>
+            <option value="event">Event Promotion</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button onclick="generatePosts()">Generate Posts</button>
+        <button class="secondary-btn" onclick="copyAllPosts()">Copy All</button>
+      </div>
+
+      <div id="status" class="status"></div>
+      <div id="results" class="results"></div>
+      <div class="footer-note">Tip: click Copy on any post, or use Copy All.</div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = "https://ghostwriter-backend-xx4m.onrender.com";
+
+    let latestPosts = [];
+
+    async function generatePosts() {
+      const topic = document.getElementById("topic").value.trim();
+      const tone = document.getElementById("tone").value;
+      const type = document.getElementById("type").value;
+      const status = document.getElementById("status");
+      const results = document.getElementById("results");
+
+      if (!topic) {
+        status.textContent = "Enter a topic first.";
+        results.innerHTML = "";
+        return;
+      }
+
+      status.textContent = "Generating...";
+      results.innerHTML = "";
+      latestPosts = [];
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/generate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ topic, tone, type })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          status.textContent = data.error || "Server error.";
+          return;
+        }
+
+        if (!data.posts || data.posts.length === 0) {
+          status.textContent = "No posts returned.";
+          return;
+        }
+
+        latestPosts = data.posts;
+        status.textContent = "Done.";
+
+        data.posts.forEach(post => {
+          const card = document.createElement("div");
+          card.className = "post-card";
+
+          const text = document.createElement("p");
+          text.className = "post-text";
+          text.textContent = post;
+
+          const button = document.createElement("button");
+          button.className = "copy-btn";
+          button.textContent = "Copy";
+          button.onclick = async () => {
+            try {
+              await navigator.clipboard.writeText(post);
+              status.textContent = "Copied.";
+            } catch (error) {
+              status.textContent = "Could not copy.";
+            }
+          };
+
+          card.appendChild(text);
+          card.appendChild(button);
+          results.appendChild(card);
+        });
+      } catch (error) {
+        console.error(error);
+        status.textContent = "Could not connect to the server.";
+      }
+    }
+
+    async function copyAllPosts() {
+      const status = document.getElementById("status");
+
+      if (!latestPosts.length) {
+        status.textContent = "Generate posts first.";
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(latestPosts.join("\n\n"));
+        status.textContent = "All posts copied.";
+      } catch (error) {
+        status.textContent = "Could not copy all posts.";
+      }
+    }
+  </script>
+</body>
+=======
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -324,4 +652,5 @@
     }
   </script>
 </body>
+>>>>>>> 6a367a52a8ee7ca97b65a78d32fa60a0bce2caa0
 </html>
