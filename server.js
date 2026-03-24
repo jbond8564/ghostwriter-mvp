@@ -1,75 +1,78 @@
 const express = require("express");
 const cors = require("cors");
+const OpenAI = require("openai");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
 app.get("/", (req, res) => {
   res.send("GhostWriter backend is running.");
 });
 
-app.post("/generate", (req, res) => {
-  const { topic, tone, type } = req.body;
+app.post("/generate", async (req, res) => {
+  try {
+    const { topic, tone, type } = req.body;
 
-  const safeTopic = (topic || "something").trim();
-  const safeTone = (tone || "bold").trim();
-  const safeType = (type || "drink").trim();
+    const safeTopic = (topic || "something").trim();
+    const safeTone = (tone || "bold").trim();
+    const safeType = (type || "drink").trim();
 
-  let posts = [];
+    const typeMap = {
+      "drink": "Drink Promo",
+      "food": "Food Special",
+      "event": "Event Promotion",
+      "happy-hour": "Happy Hour",
+      "weekend-special": "Weekend Special"
+    };
 
-  if (safeType === "drink") {
-    posts = [
-      `${safeTopic} just dropped. It’s ${safeTone} and not for beginners.`,
-      `This ${safeTopic} hits different. Come prove it.`,
-      `You think you’ve had a good ${safeTopic}? Think again.`,
-      `${safeTopic} + good vibes = your next bad decision.`,
-      `Not everyone can handle this ${safeTopic}. You in?`
-    ];
-  } else if (safeType === "food") {
-    posts = [
-      `${safeTopic} is calling your name. Answer it.`,
-      `Skip cooking tonight. ${safeTopic} is ready.`,
-      `If you're hungry, this ${safeTopic} solves that problem fast.`,
-      `${safeTopic} done right. No shortcuts.`,
-      `Pull up for ${safeTopic} and thank us later.`
-    ];
-  } else if (safeType === "event") {
-    posts = [
-      `${safeTopic} is going down. Don’t hear about it later.`,
-      `This isn’t just another night. ${safeTopic} changes the game.`,
-      `${safeTopic} is where you need to be.`,
-      `Miss this and you’ll regret it.`,
-      `${safeTopic}. Be there.`
-    ];
-  } else if (safeType === "happy-hour") {
-    posts = [
-      `Happy hour just got better. ${safeTopic} is on deck and the ${safeTone} vibes are already here.`,
-      `${safeTopic} + happy hour = the easiest decision you’ll make today.`,
-      `Clock out and pull up. ${safeTopic} is waiting.`,
-      `Good prices, strong pours, no excuses. ${safeTopic} starts now.`,
-      `If you needed a sign for happy hour, this is it: ${safeTopic}.`
-    ];
-  } else if (safeType === "weekend-special") {
-    posts = [
-      `Weekend plans solved. ${safeTopic} is the move.`,
-      `${safeTopic} is here for the weekend, and it’s not sticking around forever.`,
-      `Make this weekend count. Start with ${safeTopic}.`,
-      `Weekend special: ${safeTopic}. Show up hungry, thirsty, or both.`,
-      `${safeTopic} just became your weekend excuse. Use it.`
-    ];
-  } else {
-    posts = [
-      `${safeTopic} done ${safeTone}.`,
-      `${safeTopic} is the move.`,
-      `You’re sleeping on ${safeTopic}.`,
-      `${safeTopic} but louder.`,
-      `${safeTopic} just got interesting.`
-    ];
+    const typeLabel = typeMap[safeType] || "Promotion";
+
+    const prompt = `
+You are writing social media captions for bars, restaurants, and nightlife venues.
+
+Write exactly 5 short captions for this:
+Topic: ${safeTopic}
+Tone: ${safeTone}
+Content type: ${typeLabel}
+
+Rules:
+- Each caption should be 1 to 2 sentences
+- Make them sound human, punchy, and usable right away
+- Avoid hashtags
+- Avoid emojis
+- Avoid numbering
+- Keep each caption distinct
+- Match the requested tone
+- Return only the 5 captions, one per line
+`;
+
+    const response = await client.responses.create({
+      model: "gpt-5.4",
+      input: prompt
+    });
+
+    const text = (response.output_text || "").trim();
+
+    const posts = text
+      .split("\n")
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+
+    res.json({ posts });
+  } catch (error) {
+    console.error(error);
+    const message =
+      error?.error?.message ||
+      error?.message ||
+      "Something went wrong on the server.";
+    res.status(500).json({ error: message });
   }
-
-  res.json({ posts });
 });
 
 const PORT = process.env.PORT || 3000;
