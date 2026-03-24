@@ -12,11 +12,12 @@ const client = new OpenAI({
 });
 
 app.get("/", (req, res) => {
-  res.send("GhostWriter backend is running.");
+  res.send("GhostWriter backend LIVE AI VERSION");
 });
 
 app.post("/generate", async (req, res) => {
   try {
+console.log("USING LIVE AI BACKEND");
     const { topic, tone, type } = req.body;
 
     const safeTopic = (topic || "something").trim();
@@ -34,20 +35,20 @@ app.post("/generate", async (req, res) => {
     const typeLabel = typeMap[safeType] || "Promotion";
 
     const prompt = `
-You are writing social media captions for bars, restaurants, and nightlife venues.
+You write short social media captions for bars, restaurants, and nightlife venues.
 
-Write exactly 5 short captions for this:
+Write exactly 5 captions for:
 Topic: ${safeTopic}
 Tone: ${safeTone}
 Content type: ${typeLabel}
 
 Rules:
-- Each caption should be 1 to 2 sentences
-- Make them sound human, punchy, and usable right away
-- Avoid hashtags
-- Avoid emojis
-- Avoid numbering
-- Keep each caption distinct
+- Each caption should be 1 to 2 short sentences
+- Sound natural, punchy, and ready to post
+- No hashtags
+- No emojis
+- No numbering
+- Make each caption distinct
 - Match the requested tone
 - Return only the 5 captions, one per line
 `;
@@ -67,10 +68,12 @@ Rules:
     res.json({ posts });
   } catch (error) {
     console.error(error);
+
     const message =
       error?.error?.message ||
       error?.message ||
       "Something went wrong on the server.";
+
     res.status(500).json({ error: message });
   }
 });
