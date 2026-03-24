@@ -34,7 +34,6 @@ console.log("USING LIVE AI BACKEND");
 
     const typeLabel = typeMap[safeType] || "Promotion";
 
-    const prompt = `
 const prompt = `
 You are a strong social media copywriter for bars, restaurants, nightlife venues, and local food spots.
 
