@@ -35,35 +35,60 @@ console.log("USING LIVE AI BACKEND");
     const typeLabel = typeMap[safeType] || "Promotion";
 
     const prompt = `
-You write short social media captions for bars, restaurants, and nightlife venues.
+const prompt = `
+You are a strong social media copywriter for bars, restaurants, nightlife venues, and local food spots.
 
-Write exactly 5 captions for:
+Write exactly 5 social media captions for this business promotion.
+
 Topic: ${safeTopic}
 Tone: ${safeTone}
 Content type: ${typeLabel}
 
-Rules:
-- Each caption should be 1 to 2 short sentences
-- Sound natural, punchy, and ready to post
-- No hashtags
-- No emojis
-- No numbering
-- Make each caption distinct
-- Match the requested tone
-- Return only the 5 captions, one per line
+Requirements:
+- Each caption must feel natural, human, and ready to post
+- Each caption should be different in structure and phrasing
+- Keep each caption between 1 and 3 short sentences
+- Make them sound confident, specific, and local-business friendly
+- Avoid sounding robotic, cheesy, or corporate
+- Avoid repeating the same opening pattern
+- Do not number the captions
+- Do not use hashtags
+- Do not use emojis
+- Do not put quotation marks around the captions
+- Do not include labels like "Caption 1"
+- Return only the 5 captions, one caption per line
+
+Style guidance by content type:
+- Drink Promo: make it tempting, fun, craveable, and a little bold
+- Food Special: make it sound satisfying, craveable, and worth showing up for
+- Event Promotion: create urgency and make people feel they should be there
+- Happy Hour: make it sound like the best excuse to stop in after work
+- Weekend Special: make it sound limited, timely, and worth making plans for
+
+Style guidance by tone:
+- Funny: clever, playful, lightly witty, but still usable for a real business
+- Edgy: bold, punchy, a little provocative, but not offensive
+- Professional: polished, confident, and clean without sounding boring
+
+Important:
+- Make the captions sound like they were written by someone who understands hospitality marketing
+- Vary the energy and rhythm across the 5 captions
+- Make at least 2 captions feel especially strong and post-ready with almost no editing
 `;
+
 
     const response = await client.responses.create({
       model: "gpt-5.4",
       input: prompt
     });
 
-    const text = (response.output_text || "").trim();
+   const text = (response.output_text || "").trim();
 
-    const posts = text
-      .split("\n")
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
+const posts = text
+  .split("\n")
+  .map(line => line.trim())
+  .filter(line => line.length > 0)
+  .slice(0, 5);
 
     res.json({ posts });
   } catch (error) {
