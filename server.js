@@ -7,17 +7,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
 app.get("/", (req, res) => {
   res.send("GhostWriter backend LIVE AI VERSION");
 });
 
 app.post("/generate", async (req, res) => {
   try {
-console.log("USING LIVE AI BACKEND");
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({
+        error: "OPENAI_API_KEY is missing on the server."
+      });
+    }
+
+    const client = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+
+    console.log("USING LIVE AI BACKEND");
+
     const { topic, tone, type } = req.body;
 
     const safeTopic = (topic || "something").trim();
@@ -34,7 +41,7 @@ console.log("USING LIVE AI BACKEND");
 
     const typeLabel = typeMap[safeType] || "Promotion";
 
-const prompt = `
+    const prompt = `
 You are a strong social media copywriter for bars, restaurants, nightlife venues, and local food spots.
 
 Write exactly 5 social media captions for this business promotion.
@@ -75,19 +82,18 @@ Important:
 - Make at least 2 captions feel especially strong and post-ready with almost no editing
 `;
 
-
     const response = await client.responses.create({
       model: "gpt-5.4",
       input: prompt
     });
 
-   const text = (response.output_text || "").trim();
+    const text = (response.output_text || "").trim();
 
-const posts = text
-  .split("\n")
-  .map(line => line.trim())
-  .filter(line => line.length > 0)
-  .slice(0, 5);
+    const posts = text
+      .split("\n")
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .slice(0, 5);
 
     res.json({ posts });
   } catch (error) {
