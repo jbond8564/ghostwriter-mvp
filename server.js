@@ -43,6 +43,22 @@ app.post("/generate", (req, res) => {
       `Miss this and you’ll regret it.`,
       `${safeTopic}. Be there.`
     ];
+  } else if (safeType === "happy-hour") {
+    posts = [
+      `Happy hour just got better. ${safeTopic} is on deck and the ${safeTone} vibes are already here.`,
+      `${safeTopic} + happy hour = the easiest decision you’ll make today.`,
+      `Clock out and pull up. ${safeTopic} is waiting.`,
+      `Good prices, strong pours, no excuses. ${safeTopic} starts now.`,
+      `If you needed a sign for happy hour, this is it: ${safeTopic}.`
+    ];
+  } else if (safeType === "weekend-special") {
+    posts = [
+      `Weekend plans solved. ${safeTopic} is the move.`,
+      `${safeTopic} is here for the weekend, and it’s not sticking around forever.`,
+      `Make this weekend count. Start with ${safeTopic}.`,
+      `Weekend special: ${safeTopic}. Show up hungry, thirsty, or both.`,
+      `${safeTopic} just became your weekend excuse. Use it.`
+    ];
   } else {
     posts = [
       `${safeTopic} done ${safeTone}.`,
