@@ -588,7 +588,7 @@
       <div class="topbar">
         <div>
           <h2>Inkova Social</h2>
-          <p>Generate ready-to-post social content, organize publishing times, and show local businesses a faster way to plan what goes live next.</p>
+          <p>Create, plan, and schedule your social content in minutes.</p>
         </div>
         <div class="badge">Founder Demo</div>
       </div>
@@ -627,7 +627,7 @@
             </div>
 
             <div class="button-row">
-              <button class="primary-btn" onclick="generatePosts()">Generate Posts</button>
+              <button class="primary-btn" onclick="generatePosts()">Generate Content</button>
               <button class="regen-btn" onclick="generatePosts()">Regenerate</button>
               <button class="ghost-btn" onclick="copyAllPosts()">Copy All</button>
             </div>
@@ -690,7 +690,7 @@
             </div>
 
             <div class="banner" id="connectMessage">
-              Connected channels are not live yet. Today’s demo focuses on faster content creation and schedule planning.
+              Connected channels are coming soon.
             </div>
 
             <div class="list-box">
@@ -803,7 +803,7 @@
             <div class="list-item">
               <div class="list-item-top">
                 <div class="list-item-title">${record.type || "content"} • ${record.tone || "tone"}</div>
-                <span class="status-pill">Saved</span>
+                <span class="status-pill">Generated</span>
               </div>
               <p class="list-item-text">${truncateText(preview)}</p>
             </div>
@@ -827,7 +827,7 @@
             <div class="list-item">
               <div class="list-item-top">
                 <div class="list-item-title">${item.platform || "Platform"} • ${item.repeat || "One time"}</div>
-                <span class="status-pill">${item.status || "Saved"}</span>
+                <span class="status-pill">${item.status || "Scheduled"}</span>
               </div>
               <p class="list-item-text">${truncateText(item.postText)}</p>
               <div class="small" style="margin-top: 8px;">${formatDateTime(item.date, item.time)}</div>
