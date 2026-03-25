@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai");
-const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
 
 const app = express();
 
@@ -191,7 +191,7 @@ Important:
     }
 
     const record = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       topic,
       tone,
       type,
@@ -258,7 +258,7 @@ app.post("/schedule", (req, res) => {
     }
 
     const scheduled = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       postText,
       platform,
       date: date || null,
