@@ -264,7 +264,7 @@ app.post("/schedule", (req, res) => {
       date: date || null,
       time: time || null,
       repeat,
-      status: "saved",
+      status: "scheduled",
       createdAt: new Date().toISOString()
     };
 
