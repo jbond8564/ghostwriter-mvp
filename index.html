@@ -182,6 +182,58 @@
       color: #9ca3af;
       font-size: 13px;
     }
+
+    .usage-box {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #111827;
+      border: 1px solid #374151;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .paywall {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 16px;
+      background: #0f172a;
+      border: 1px solid #374151;
+      display: none;
+    }
+
+    .paywall h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .paywall p {
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .plan-box {
+      margin: 16px 0;
+      padding: 16px;
+      border-radius: 14px;
+      background: #111827;
+      border: 1px solid #374151;
+    }
+
+    .price {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 8px 0;
+    }
+
+    .small {
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -192,51 +244,127 @@
           <h1>GhostWriter Social</h1>
           <p class="subtitle">AI social captions for bars, restaurants, and events.</p>
         </div>
-        <div class="badge">LIVE MVP</div>
+        <div class="badge">MVP</div>
       </div>
 
-      <div class="grid">
-        <div class="field full">
-          <label for="topic">Topic</label>
-          <input id="topic" type="text" placeholder="Spicy margarita, taco night, live DJ event, $5 wells, Friday special" />
+      <div id="appContent">
+        <div class="grid">
+          <div class="field full">
+            <label for="topic">Topic</label>
+            <input id="topic" type="text" placeholder="Spicy margarita, taco night, live DJ event, happy hour" />
+          </div>
+
+          <div class="field">
+            <label for="tone">Tone</label>
+            <select id="tone">
+              <option value="funny">Funny</option>
+              <option value="edgy">Edgy</option>
+              <option value="professional">Professional</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="type">Content Type</label>
+            <select id="type">
+              <option value="drink">Drink Promo</option>
+              <option value="food">Food Special</option>
+              <option value="event">Event Promotion</option>
+              <option value="happy-hour">Happy Hour</option>
+              <option value="weekend-special">Weekend Special</option>
+            </select>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="tone">Tone</label>
-          <select id="tone">
-            <option value="funny">Funny</option>
-            <option value="edgy">Edgy</option>
-            <option value="professional">Professional</option>
-          </select>
+        <div class="actions">
+          <button onclick="generatePosts()">Generate Posts</button>
+          <button class="secondary-btn" onclick="copyAllPosts()">Copy All</button>
         </div>
 
-        <div class="field">
-          <label for="type">Content Type</label>
-          <select id="type">
-            <option value="drink">Drink Promo</option>
-            <option value="food">Food Special</option>
-            <option value="event">Event Promotion</option>
-            <option value="happy-hour">Happy Hour</option>
-            <option value="weekend-special">Weekend Special</option>
-          </select>
+        <div class="usage-box">
+          <span id="usageText">Free generations left today: 3</span>
         </div>
+
+        <div id="status" class="status"></div>
+        <div id="results" class="results"></div>
+        <div class="footer-note">Tip: use Copy All for a quick batch of captions.</div>
       </div>
 
-      <div class="actions">
-        <button onclick="generatePosts()">Generate Posts</button>
-        <button class="secondary-btn" onclick="copyAllPosts()">Copy All</button>
-      </div>
+      <div id="paywall" class="paywall">
+        <h2>Unlock GhostWriter Pro</h2>
+        <p>You’ve used your free generations for today. Upgrade to get unlimited caption generations, faster content testing, and a smoother workflow for your business.</p>
 
-      <div id="status" class="status"></div>
-      <div id="results" class="results"></div>
-      <div class="footer-note">Tip: use Copy All for a quick batch of captions.</div>
+        <div class="plan-box">
+          <div>GhostWriter Pro</div>
+          <div class="price">$9<span class="small">/month</span></div>
+          <p class="small">Unlimited generations • Built for bars, restaurants, and events</p>
+        </div>
+
+        <div class="actions">
+          <button onclick="handleUpgradeClick()">Upgrade to Pro</button>
+          <button class="secondary-btn" onclick="resetFreeLimit()">Reset Demo Limit</button>
+        </div>
+
+        <p id="upgradeMessage" class="small"></p>
+      </div>
     </div>
   </div>
 
   <script>
     const API_BASE_URL = "https://ghostwriter-backend-xx4m.onrender.com";
+    const DAILY_FREE_LIMIT = 3;
 
     let latestPosts = [];
+
+    function getTodayKey() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      return `ghostwriter_usage_${yyyy}-${mm}-${dd}`;
+    }
+
+    function getUsageCount() {
+      const key = getTodayKey();
+      return parseInt(localStorage.getItem(key) || "0", 10);
+    }
+
+    function setUsageCount(count) {
+      const key = getTodayKey();
+      localStorage.setItem(key, String(count));
+    }
+
+    function getRemainingUses() {
+      return Math.max(0, DAILY_FREE_LIMIT - getUsageCount());
+    }
+
+    function updateUsageUI() {
+      const usageText = document.getElementById("usageText");
+      const appContent = document.getElementById("appContent");
+      const paywall = document.getElementById("paywall");
+      const remaining = getRemainingUses();
+
+      usageText.textContent = `Free generations left today: ${remaining}`;
+
+      if (remaining <= 0) {
+        appContent.classList.add("hidden");
+        paywall.style.display = "block";
+      } else {
+        appContent.classList.remove("hidden");
+        paywall.style.display = "none";
+      }
+    }
+
+    function handleUpgradeClick() {
+      const msg = document.getElementById("upgradeMessage");
+      msg.textContent = "Upgrade flow coming soon. For now, this tells us people are interested.";
+      console.log("FAKE_PAYWALL_CLICKED");
+    }
+
+    function resetFreeLimit() {
+      setUsageCount(0);
+      document.getElementById("upgradeMessage").textContent = "";
+      updateUsageUI();
+    }
 
     async function generatePosts() {
       const topic = document.getElementById("topic").value.trim();
@@ -248,6 +376,11 @@
       if (!topic) {
         status.textContent = "Enter a topic first.";
         results.innerHTML = "";
+        return;
+      }
+
+      if (getRemainingUses() <= 0) {
+        updateUsageUI();
         return;
       }
 
@@ -276,6 +409,10 @@
           return;
         }
 
+        const newUsage = getUsageCount() + 1;
+        setUsageCount(newUsage);
+        updateUsageUI();
+
         latestPosts = data.posts;
         status.textContent = "Done.";
 
@@ -303,6 +440,12 @@
           card.appendChild(button);
           results.appendChild(card);
         });
+
+        if (getRemainingUses() <= 0) {
+          setTimeout(() => {
+            updateUsageUI();
+          }, 1200);
+        }
       } catch (error) {
         console.error(error);
         status.textContent = "Could not connect to the server.";
@@ -324,6 +467,8 @@
         status.textContent = "Could not copy all posts.";
       }
     }
+
+    updateUsageUI();
   </script>
 </body>
 </html>
