@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quillor</title>
+  <title>Inkora Social</title>
   <style>
     * {
       box-sizing: border-box;
@@ -385,7 +385,7 @@
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
-        <h1>Quillor</h1>
+        <h1>Inkora Social</h1>
         <p>Create captions, preview connected accounts, and show users a more complete product vision.</p>
       </div>
 
@@ -425,7 +425,7 @@
     <main class="main">
       <div class="topbar">
         <div>
-          <h2>Quillor</h2>
+          <h2>Inkora Social</h2>
           <p>AI social captions for bars, restaurants, nightlife, and events.</p>
         </div>
         <div class="badge">Product Preview</div>
@@ -466,6 +466,7 @@
 
             <div class="button-row">
               <button class="primary-btn" onclick="generatePosts()">Generate Posts</button>
+              <button class="ghost-btn" onclick="regeneratePosts()">Regenerate</button>
               <button class="ghost-btn" onclick="copyAllPosts()">Copy All</button>
             </div>
 
@@ -477,11 +478,11 @@
           </div>
 
           <div id="paywall" class="paywall">
-            <h3>Unlock Quillor Pro</h3>
+            <h3>Unlock Inkora Pro</h3>
             <p class="muted">You’ve used your free generations for today. Upgrade to unlock unlimited generations, scheduling tools, and social account workflows.</p>
 
             <div class="plan-box">
-              <div>Quillor Pro</div>
+              <div>Inkora Pro</div>
               <div class="price">$9<span class="small">/month</span></div>
               <div class="small">Unlimited generations • scheduling preview • account workflows • bars, restaurants, and events</div>
             </div>
@@ -514,7 +515,7 @@
 
             <div class="preview-box">
               <h3 style="font-size:16px; margin-bottom:8px;">Scheduling Preview</h3>
-              <p class="muted">Each caption includes a fake schedule flow so users can picture auto-posting without you building the real backend yet.</p>
+              <p class="muted">Each caption includes a fake schedule flow so users can picture auto-posting without building the real backend yet.</p>
             </div>
 
             <div id="connectMessage" class="banner">
@@ -531,18 +532,18 @@
     const DAILY_FREE_LIMIT = 3;
 
     let latestPosts = [];
+    let lastGeneratePayload = null;
 
     function getTodayKey() {
       const today = new Date();
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, "0");
       const dd = String(today.getDate()).padStart(2, "0");
-      return `quillor_usage_${yyyy}-${mm}-${dd}`;
+      return `inkora_usage_${yyyy}-${mm}-${dd}`;
     }
 
     function getUsageCount() {
-      const key = getTodayKey();
-      return parseInt(localStorage.getItem(key) || "0", 10);
+      return parseInt(localStorage.getItem(getTodayKey()) || "0", 10);
     }
 
     function setUsageCount(count) {
@@ -590,18 +591,9 @@
       updateUsageUI();
     }
 
-    async function generatePosts() {
-      const topic = document.getElementById("topic").value.trim();
-      const tone = document.getElementById("tone").value;
-      const type = document.getElementById("type").value;
+    async function requestPosts(payload, isRegenerate = false) {
       const status = document.getElementById("status");
       const results = document.getElementById("results");
-
-      if (!topic) {
-        status.textContent = "Enter a topic first.";
-        results.innerHTML = "";
-        return;
-      }
 
       if (getRemainingUses() <= 0) {
         updateUsageUI();
@@ -609,7 +601,7 @@
         return;
       }
 
-      status.textContent = "Generating...";
+      status.textContent = isRegenerate ? "Regenerating..." : "Generating...";
       results.innerHTML = "";
       latestPosts = [];
 
@@ -619,7 +611,7 @@
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ topic, tone, type })
+          body: JSON.stringify(payload)
         });
 
         const data = await response.json();
@@ -636,7 +628,7 @@
 
         setUsageCount(getUsageCount() + 1);
         latestPosts = data.posts;
-        status.textContent = "Done.";
+        status.textContent = isRegenerate ? "New posts generated." : "Done.";
 
         data.posts.forEach((post, index) => {
           const card = document.createElement("div");
@@ -719,6 +711,34 @@
         console.error(error);
         status.textContent = "Could not connect to the server.";
       }
+    }
+
+    async function generatePosts() {
+      const topic = document.getElementById("topic").value.trim();
+      const tone = document.getElementById("tone").value;
+      const type = document.getElementById("type").value;
+      const status = document.getElementById("status");
+      const results = document.getElementById("results");
+
+      if (!topic) {
+        status.textContent = "Enter a topic first.";
+        results.innerHTML = "";
+        return;
+      }
+
+      lastGeneratePayload = { topic, tone, type };
+      await requestPosts(lastGeneratePayload, false);
+    }
+
+    async function regeneratePosts() {
+      const status = document.getElementById("status");
+
+      if (!lastGeneratePayload) {
+        status.textContent = "Generate posts first.";
+        return;
+      }
+
+      await requestPosts(lastGeneratePayload, true);
     }
 
     function toggleSchedulePanel(index) {
