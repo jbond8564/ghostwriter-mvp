@@ -5,120 +5,174 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inkora Social</title>
   <style>
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #08101d;
+      --panel: #0f1728;
+      --panel-2: #121c31;
+      --panel-3: #0b1423;
+      --border: #22314a;
+      --border-soft: #18253a;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --muted-2: #cbd5e1;
+      --accent: #dbeafe;
+      --accent-strong: #f8fafc;
+      --accent-text: #0f172a;
+      --success: #86efac;
+      --warning: #fde68a;
+      --danger: #fca5a5;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
     }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1220;
-      color: #f8fafc;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(147, 197, 253, 0.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.03), transparent 22%),
+        var(--bg);
+      color: var(--text);
     }
 
     .app-shell {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 290px 1fr;
       min-height: 100vh;
     }
 
     .sidebar {
-      background: #111827;
-      border-right: 1px solid #1f2937;
+      background: rgba(10, 17, 30, 0.94);
+      border-right: 1px solid var(--border-soft);
       padding: 24px 18px;
+      backdrop-filter: blur(10px);
     }
 
     .brand {
-      margin-bottom: 24px;
+      margin-bottom: 28px;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(17, 28, 48, 0.95), rgba(10, 18, 32, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(147, 197, 253, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(147, 197, 253, 0.18);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
     }
 
     .brand h1 {
       margin: 0 0 8px;
-      font-size: 26px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
     }
 
     .brand p {
       margin: 0;
-      color: #94a3b8;
+      color: var(--muted);
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    .sidebar-section {
-      margin-top: 24px;
-    }
+    .sidebar-section { margin-top: 26px; }
 
     .sidebar-section h2 {
       margin: 0 0 12px;
-      font-size: 14px;
-      color: #cbd5e1;
+      font-size: 12px;
+      color: var(--muted-2);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.09em;
     }
 
     .mini-card {
-      background: #0f172a;
-      border: 1px solid #1f2937;
-      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(16, 24, 41, 0.98), rgba(11, 19, 35, 0.98));
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
       padding: 14px;
       margin-bottom: 12px;
     }
 
-    .mini-card h3 {
-      margin: 0 0 6px;
-      font-size: 15px;
+    .mini-card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
     }
 
+    .mini-card h3 { margin: 0; font-size: 15px; }
+
     .mini-card p {
-      margin: 0 0 10px;
-      color: #94a3b8;
+      margin: 0 0 12px;
+      color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
     }
 
     .status-pill {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       padding: 6px 10px;
       border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-      background: #172033;
-      color: #cbd5e1;
-      border: 1px solid #253149;
+      font-size: 11px;
+      font-weight: 700;
+      background: #121e31;
+      color: var(--muted-2);
+      border: 1px solid var(--border);
+      white-space: nowrap;
     }
+
+    .status-pill.live { color: var(--success); }
+    .status-pill.soon { color: var(--warning); }
 
     .connect-btn,
     .ghost-btn,
-    .action-btn,
     .primary-btn,
     .copy-btn,
-    .schedule-btn {
-      border: 1px solid #334155;
-      border-radius: 10px;
+    .schedule-btn,
+    .action-link {
+      border: 1px solid #31425f;
+      border-radius: 12px;
       font-size: 14px;
       cursor: pointer;
       transition: 0.2s ease;
+      font-weight: 600;
     }
 
     .connect-btn,
     .ghost-btn,
     .copy-btn,
-    .schedule-btn {
+    .schedule-btn,
+    .action-link {
       background: transparent;
-      color: #f8fafc;
+      color: var(--text);
       padding: 10px 12px;
     }
 
     .connect-btn:hover,
     .ghost-btn:hover,
     .copy-btn:hover,
-    .schedule-btn:hover {
-      background: #162033;
+    .schedule-btn:hover,
+    .action-link:hover {
+      background: #142036;
+      border-color: #415578;
+      transform: translateY(-1px);
     }
 
-    .main {
-      padding: 28px;
-    }
+    .main { padding: 28px; }
 
     .topbar {
       display: flex;
@@ -130,49 +184,55 @@
     }
 
     .topbar h2 {
-      margin: 0 0 6px;
-      font-size: 30px;
+      margin: 0 0 8px;
+      font-size: 34px;
+      letter-spacing: -0.04em;
     }
 
     .topbar p {
       margin: 0;
-      color: #94a3b8;
-      font-size: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 760px;
     }
 
     .badge {
-      background: #93c5fd;
-      color: #111827;
-      padding: 8px 12px;
+      background: rgba(219, 234, 254, 0.96);
+      color: #0f172a;
+      padding: 9px 14px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: bold;
+      font-weight: 800;
+      letter-spacing: 0.03em;
     }
 
     .content-grid {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
+      grid-template-columns: 1.25fr 0.75fr;
       gap: 20px;
     }
 
     .panel {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+      background: linear-gradient(180deg, rgba(15, 23, 40, 0.98), rgba(11, 19, 35, 0.98));
+      border: 1px solid var(--border-soft);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow);
     }
 
     .panel h3 {
       margin-top: 0;
       margin-bottom: 8px;
-      font-size: 20px;
+      font-size: 22px;
+      letter-spacing: -0.02em;
     }
 
     .panel-subtitle {
       margin: 0 0 18px;
-      color: #94a3b8;
+      color: var(--muted);
       font-size: 14px;
+      line-height: 1.6;
     }
 
     .grid {
@@ -181,9 +241,7 @@
       grid-template-columns: 1fr 1fr;
     }
 
-    .field.full {
-      grid-column: 1 / -1;
-    }
+    .field.full { grid-column: 1 / -1; }
 
     .field {
       display: flex;
@@ -192,110 +250,92 @@
     }
 
     label {
-      font-size: 14px;
-      font-weight: bold;
-      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted-2);
+      letter-spacing: 0.01em;
     }
 
-    input,
-    select {
+    input, select {
       width: 100%;
       padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #334155;
-      background: #0f172a;
-      color: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid #2d3d58;
+      background: #0a1322;
+      color: var(--text);
       font-size: 15px;
+      outline: none;
+      transition: 0.2s ease;
     }
 
-    input::placeholder {
-      color: #64748b;
+    input:focus, select:focus {
+      border-color: #6f8fbc;
+      box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.08);
     }
+
+    input::placeholder { color: #64748b; }
 
     .button-row {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      margin-top: 16px;
+      margin-top: 18px;
     }
 
     .primary-btn {
-      background: #f8fafc;
-      color: #111827;
+      background: var(--accent-strong);
+      color: var(--accent-text);
       padding: 12px 16px;
-      font-weight: bold;
+      font-weight: 800;
+      border-color: transparent;
     }
 
     .primary-btn:hover {
-      opacity: 0.92;
+      opacity: 0.95;
       transform: translateY(-1px);
     }
 
-    .ghost-btn {
-      padding: 12px 16px;
-    }
-
-    .usage-box,
-    .plan-box,
-    .preview-box {
-      background: #0f172a;
-      border: 1px solid #1f2937;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-
-    .usage-number {
-      font-size: 28px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    .muted {
-      color: #94a3b8;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .price {
-      font-size: 30px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    .small {
-      font-size: 13px;
-      color: #94a3b8;
-    }
+    .ghost-btn { padding: 12px 16px; }
 
     .status {
       min-height: 22px;
       margin-top: 14px;
       font-size: 14px;
-      color: #93c5fd;
+      color: var(--accent);
     }
 
-    .results-panel {
-      margin-top: 20px;
-    }
-
-    .results-list {
-      display: grid;
-      gap: 14px;
-    }
+    .results-panel { margin-top: 22px; }
+    .results-list { display: grid; gap: 14px; }
 
     .post-card {
-      background: #0f172a;
-      border: 1px solid #1f2937;
-      border-radius: 16px;
-      padding: 16px;
+      background: linear-gradient(180deg, rgba(9, 17, 31, 0.98), rgba(8, 15, 28, 0.98));
+      border: 1px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .post-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .post-index {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted-2);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
     .post-text {
       margin: 0 0 14px;
-      line-height: 1.6;
-      color: #f8fafc;
+      line-height: 1.7;
+      color: var(--text);
       white-space: pre-wrap;
+      font-size: 15px;
     }
 
     .post-actions {
@@ -307,17 +347,17 @@
     .schedule-panel {
       display: none;
       margin-top: 14px;
-      background: #0b1220;
-      border: 1px solid #243146;
-      border-radius: 14px;
+      background: #091221;
+      border: 1px solid #243450;
+      border-radius: 16px;
       padding: 14px;
     }
 
     .schedule-title {
       margin: 0 0 12px;
       font-size: 14px;
-      font-weight: bold;
-      color: #dbeafe;
+      font-weight: 800;
+      color: var(--accent);
     }
 
     .schedule-grid {
@@ -327,57 +367,118 @@
       margin-bottom: 12px;
     }
 
+    .usage-box,
+    .plan-box,
+    .preview-box,
+    .list-box,
     .banner {
-      margin-top: 14px;
-      background: #0f172a;
-      border: 1px solid #1f2937;
-      border-radius: 14px;
-      padding: 14px;
-      color: #cbd5e1;
+      background: linear-gradient(180deg, rgba(11, 20, 35, 0.95), rgba(9, 16, 28, 0.95));
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .usage-number {
+      font-size: 34px;
+      font-weight: 800;
+      margin-top: 8px;
+      letter-spacing: -0.04em;
+    }
+
+    .muted {
+      color: var(--muted);
       font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .price {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 10px 0;
+      letter-spacing: -0.04em;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .mini-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .mini-item {
+      padding: 12px;
+      border-radius: 14px;
+      background: #0a1322;
+      border: 1px solid var(--border-soft);
+    }
+
+    .mini-item-title {
+      font-size: 13px;
+      color: var(--muted-2);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .mini-item-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .mini-item-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .list-box ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted-2);
+    }
+
+    .list-box li {
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .banner {
+      color: var(--muted-2);
+      font-size: 14px;
+      line-height: 1.6;
     }
 
     .paywall {
       display: none;
       margin-top: 18px;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(14, 21, 36, 0.98), rgba(10, 18, 31, 0.98));
+      border: 1px solid #31425f;
+      border-radius: 18px;
       padding: 18px;
+      box-shadow: var(--shadow);
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     @media (max-width: 980px) {
-      .app-shell {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        border-right: none;
-        border-bottom: 1px solid #1f2937;
-      }
-
-      .content-grid {
-        grid-template-columns: 1fr;
-      }
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 1px solid var(--border-soft); }
+      .content-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 700px) {
-      .grid,
-      .schedule-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .main {
-        padding: 16px;
-      }
-
-      .sidebar {
-        padding: 18px;
-      }
+      .grid, .schedule-grid { grid-template-columns: 1fr; }
+      .main { padding: 16px; }
+      .sidebar { padding: 18px; }
+      .topbar h2 { font-size: 28px; }
     }
   </style>
 </head>
@@ -385,39 +486,48 @@
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
-        <h1>Inkora Social</h1>
-        <p>Create captions, preview connected accounts, and show users a more complete product vision.</p>
+        <div class="eyebrow">Early Access</div>
+        <h1>Inkora</h1>
+        <p>AI-powered social writing for restaurants, nightlife, events, and local brands that need better content fast.</p>
       </div>
 
       <div class="sidebar-section">
-        <h2>Connected Accounts</h2>
+        <h2>Channels</h2>
 
         <div class="mini-card">
-          <h3>Instagram</h3>
-          <p>Schedule promos and publish caption-ready content for business accounts.</p>
-          <button class="connect-btn" onclick="fakeConnect('Instagram')">Connect</button>
-          <div style="margin-top:10px;"><span class="status-pill">Preview only</span></div>
+          <div class="mini-card-head">
+            <h3>X</h3>
+            <span class="status-pill live">Next live channel</span>
+          </div>
+          <p>Best first fit for real posting, reminders, promotions, and quick updates.</p>
+          <button class="connect-btn" onclick="fakeConnect('X')">Connect X</button>
         </div>
 
         <div class="mini-card">
-          <h3>Facebook</h3>
-          <p>Preview Page posting workflows for events, specials, and recurring promos.</p>
-          <button class="connect-btn" onclick="fakeConnect('Facebook')">Connect</button>
-          <div style="margin-top:10px;"><span class="status-pill">Preview only</span></div>
+          <div class="mini-card-head">
+            <h3>Instagram</h3>
+            <span class="status-pill soon">Coming soon</span>
+          </div>
+          <p>Create promo captions and plan publishing workflows for business content.</p>
+          <button class="connect-btn" onclick="fakeConnect('Instagram')">Connect Instagram</button>
         </div>
 
         <div class="mini-card">
-          <h3>TikTok</h3>
-          <p>Show creators and venues what a short-form workflow could look like.</p>
-          <button class="connect-btn" onclick="fakeConnect('TikTok')">Connect</button>
-          <div style="margin-top:10px;"><span class="status-pill">Preview only</span></div>
+          <div class="mini-card-head">
+            <h3>Facebook</h3>
+            <span class="status-pill soon">Coming soon</span>
+          </div>
+          <p>Draft content for events, weekly specials, and recurring promotions.</p>
+          <button class="connect-btn" onclick="fakeConnect('Facebook')">Connect Facebook</button>
         </div>
 
         <div class="mini-card">
-          <h3>X</h3>
-          <p>Preview short-form promo scheduling for announcements and reminders.</p>
-          <button class="connect-btn" onclick="fakeConnect('X')">Connect</button>
-          <div style="margin-top:10px;"><span class="status-pill">Preview only</span></div>
+          <div class="mini-card-head">
+            <h3>TikTok</h3>
+            <span class="status-pill soon">Coming soon</span>
+          </div>
+          <p>Plan short-form campaign ideas and creator-style post concepts.</p>
+          <button class="connect-btn" onclick="fakeConnect('TikTok')">Connect TikTok</button>
         </div>
       </div>
     </aside>
@@ -426,21 +536,21 @@
       <div class="topbar">
         <div>
           <h2>Inkora Social</h2>
-          <p>AI social captions for bars, restaurants, nightlife, and events.</p>
+          <p>Generate ready-to-post social content for bars, restaurants, nightlife, and local events, then save a publishing plan in one place.</p>
         </div>
-        <div class="badge">Product Preview</div>
+        <div class="badge">Founder Demo</div>
       </div>
 
       <div class="content-grid">
         <section>
           <div id="generatorPanel" class="panel">
-            <h3>Create Captions</h3>
-            <p class="panel-subtitle">Generate content, preview scheduling, and test premium intent without building full automation yet.</p>
+            <h3>Create content</h3>
+            <p class="panel-subtitle">Turn a simple topic into multiple post options you can review, copy, and save into your content queue.</p>
 
             <div class="grid">
               <div class="field full">
                 <label for="topic">Topic</label>
-                <input id="topic" type="text" placeholder="Spicy margarita, taco night, live DJ event, happy hour, Friday special" />
+                <input id="topic" type="text" placeholder="Thursday happy hour, spicy margarita launch, taco night, live DJ Friday, weekend brunch" />
               </div>
 
               <div class="field">
@@ -453,7 +563,7 @@
               </div>
 
               <div class="field">
-                <label for="type">Content Type</label>
+                <label for="type">Content type</label>
                 <select id="type">
                   <option value="drink">Drink Promo</option>
                   <option value="food">Food Special</option>
@@ -466,7 +576,6 @@
 
             <div class="button-row">
               <button class="primary-btn" onclick="generatePosts()">Generate Posts</button>
-              <button class="ghost-btn" onclick="regeneratePosts()">Regenerate</button>
               <button class="ghost-btn" onclick="copyAllPosts()">Copy All</button>
             </div>
 
@@ -478,13 +587,13 @@
           </div>
 
           <div id="paywall" class="paywall">
-            <h3>Unlock Inkora Pro</h3>
-            <p class="muted">You’ve used your free generations for today. Upgrade to unlock unlimited generations, scheduling tools, and social account workflows.</p>
+            <h3>Upgrade to Inkora Pro</h3>
+            <p class="muted">You’ve used today’s free generations. Upgrade to unlock unlimited content generation, saved publishing workflows, and connected channel tools.</p>
 
             <div class="plan-box">
-              <div>Inkora Pro</div>
+              <div class="small">Inkora Pro</div>
               <div class="price">$9<span class="small">/month</span></div>
-              <div class="small">Unlimited generations • scheduling preview • account workflows • bars, restaurants, and events</div>
+              <div class="small">Unlimited generations • saved schedules • connected social channels • built for hospitality, nightlife, and events</div>
             </div>
 
             <div class="button-row">
@@ -499,27 +608,50 @@
         <section>
           <div class="panel">
             <h3>Workspace</h3>
-            <p class="panel-subtitle">Use this column to make the app feel more complete and premium.</p>
+            <p class="panel-subtitle">Track usage, keep a small content history, and show owners that generated posts can be saved into a workflow.</p>
 
             <div class="usage-box">
-              <div class="small">Free usage today</div>
+              <div class="small">Free usage remaining today</div>
               <div id="usageNumber" class="usage-number">3</div>
               <div id="usageText" class="muted">3 generations left today</div>
             </div>
 
             <div class="plan-box">
               <div class="small">Current plan</div>
-              <div style="font-size:20px; font-weight:bold; margin-top:8px;">Free Plan</div>
-              <div class="muted" style="margin-top:8px;">Generate captions, copy posts, and preview premium workflows.</div>
+              <div style="font-size: 22px; font-weight: 800; margin-top: 8px;">Free</div>
+              <div class="muted" style="margin-top: 8px;">Generate content, copy posts, and save a simple publishing queue before enabling live channel automations.</div>
             </div>
 
             <div class="preview-box">
-              <h3 style="font-size:16px; margin-bottom:8px;">Scheduling Preview</h3>
-              <p class="muted">Each caption includes a fake schedule flow so users can picture auto-posting without building the real backend yet.</p>
+              <h3 style="font-size: 17px; margin-bottom: 8px;">What to show in the meeting</h3>
+              <p class="muted">Lead with real content generation first. Then save one schedule to show how owners could organize upcoming posts without writing everything from scratch.</p>
+            </div>
+
+            <div class="list-box">
+              <div class="small">What this MVP already proves</div>
+              <ul>
+                <li>Owners can generate social-ready content from a simple prompt.</li>
+                <li>Scheduling interest can be tested with a saved posting workflow.</li>
+                <li>Upgrade intent can be measured with a lightweight paywall.</li>
+              </ul>
+            </div>
+
+            <div class="plan-box">
+              <div class="small">Recent schedules</div>
+              <div id="scheduledList" class="mini-list">
+                <div class="mini-item"><div class="mini-item-text">No scheduled posts yet.</div></div>
+              </div>
+            </div>
+
+            <div class="plan-box">
+              <div class="small">Recent generations</div>
+              <div id="historyList" class="mini-list">
+                <div class="mini-item"><div class="mini-item-text">No post history yet.</div></div>
+              </div>
             </div>
 
             <div id="connectMessage" class="banner">
-              Social account connections are preview-only right now.
+              Live channel publishing is rolling out in stages. For today’s demo, the strongest workflow is generating content and saving a posting plan.
             </div>
           </div>
         </section>
@@ -532,7 +664,6 @@
     const DAILY_FREE_LIMIT = 3;
 
     let latestPosts = [];
-    let lastGeneratePayload = null;
 
     function getTodayKey() {
       const today = new Date();
@@ -575,14 +706,14 @@
 
     function fakeConnect(platform) {
       const msg = document.getElementById("connectMessage");
-      msg.textContent = `${platform} connection preview clicked. Full social connection support is coming soon.`;
-      console.log(`FAKE_CONNECT_${platform.toUpperCase()}`);
+      msg.textContent = `${platform} is on the product roadmap. Today the best workflow to show is generating content and saving a posting plan.`;
+      console.log(`CHANNEL_CLICK_${platform.toUpperCase()}`);
     }
 
     function handleUpgradeClick() {
       const msg = document.getElementById("upgradeMessage");
-      msg.textContent = "Upgrade flow coming soon. This click helps validate purchase intent.";
-      console.log("FAKE_PAYWALL_CLICKED");
+      msg.textContent = "Upgrade flow coming soon. This click is being used to validate purchase intent.";
+      console.log("UPGRADE_INTENT_CLICKED");
     }
 
     function resetFreeLimit() {
@@ -591,9 +722,18 @@
       updateUsageUI();
     }
 
-    async function requestPosts(payload, isRegenerate = false) {
+    async function generatePosts() {
+      const topic = document.getElementById("topic").value.trim();
+      const tone = document.getElementById("tone").value;
+      const type = document.getElementById("type").value;
       const status = document.getElementById("status");
       const results = document.getElementById("results");
+
+      if (!topic) {
+        status.textContent = "Enter a topic first.";
+        results.innerHTML = "";
+        return;
+      }
 
       if (getRemainingUses() <= 0) {
         updateUsageUI();
@@ -601,17 +741,15 @@
         return;
       }
 
-      status.textContent = isRegenerate ? "Regenerating..." : "Generating...";
+      status.textContent = "Generating content...";
       results.innerHTML = "";
       latestPosts = [];
 
       try {
         const response = await fetch(`${API_BASE_URL}/generate`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic, tone, type })
         });
 
         const data = await response.json();
@@ -628,11 +766,25 @@
 
         setUsageCount(getUsageCount() + 1);
         latestPosts = data.posts;
-        status.textContent = isRegenerate ? "New posts generated." : "Done.";
+        status.textContent = "Posts generated.";
 
         data.posts.forEach((post, index) => {
           const card = document.createElement("div");
           card.className = "post-card";
+
+          const top = document.createElement("div");
+          top.className = "post-card-top";
+
+          const postIndex = document.createElement("div");
+          postIndex.className = "post-index";
+          postIndex.textContent = `Post ${index + 1}`;
+
+          const postTag = document.createElement("span");
+          postTag.className = "status-pill";
+          postTag.textContent = "Ready to review";
+
+          top.appendChild(postIndex);
+          top.appendChild(postTag);
 
           const text = document.createElement("p");
           text.className = "post-text";
@@ -647,7 +799,7 @@
           copyButton.onclick = async () => {
             try {
               await navigator.clipboard.writeText(post);
-              status.textContent = "Copied.";
+              status.textContent = "Post copied.";
             } catch (error) {
               status.textContent = "Could not copy.";
             }
@@ -655,7 +807,7 @@
 
           const scheduleButton = document.createElement("button");
           scheduleButton.className = "schedule-btn";
-          scheduleButton.textContent = "Schedule";
+          scheduleButton.textContent = "Save Schedule";
           scheduleButton.onclick = () => toggleSchedulePanel(index);
 
           actions.appendChild(copyButton);
@@ -665,10 +817,10 @@
           schedulePanel.className = "schedule-panel";
           schedulePanel.id = `schedule-panel-${index}`;
           schedulePanel.innerHTML = `
-            <div class="schedule-title">Schedule this post</div>
+            <div class="schedule-title">Save this post to the publishing queue</div>
             <div class="schedule-grid">
               <div class="field">
-                <label>Platform</label>
+                <label>Channel</label>
                 <select id="platform-${index}">
                   <option>Instagram</option>
                   <option>Facebook</option>
@@ -694,12 +846,13 @@
               </div>
             </div>
             <div class="button-row">
-              <button class="primary-btn" onclick="fakeSchedule(${index})">Schedule Post</button>
+              <button class="primary-btn" onclick="realSchedule(${index})">Save Schedule</button>
               <button class="ghost-btn" onclick="hideSchedulePanel(${index})">Cancel</button>
             </div>
             <div class="small" id="schedule-message-${index}" style="margin-top:10px;"></div>
           `;
 
+          card.appendChild(top);
           card.appendChild(text);
           card.appendChild(actions);
           card.appendChild(schedulePanel);
@@ -707,38 +860,11 @@
         });
 
         updateUsageUI();
+        await loadHistory();
       } catch (error) {
         console.error(error);
         status.textContent = "Could not connect to the server.";
       }
-    }
-
-    async function generatePosts() {
-      const topic = document.getElementById("topic").value.trim();
-      const tone = document.getElementById("tone").value;
-      const type = document.getElementById("type").value;
-      const status = document.getElementById("status");
-      const results = document.getElementById("results");
-
-      if (!topic) {
-        status.textContent = "Enter a topic first.";
-        results.innerHTML = "";
-        return;
-      }
-
-      lastGeneratePayload = { topic, tone, type };
-      await requestPosts(lastGeneratePayload, false);
-    }
-
-    async function regeneratePosts() {
-      const status = document.getElementById("status");
-
-      if (!lastGeneratePayload) {
-        status.textContent = "Generate posts first.";
-        return;
-      }
-
-      await requestPosts(lastGeneratePayload, true);
     }
 
     function toggleSchedulePanel(index) {
@@ -750,15 +876,34 @@
       document.getElementById(`schedule-panel-${index}`).style.display = "none";
     }
 
-    function fakeSchedule(index) {
+    async function realSchedule(index) {
+      const postText = latestPosts[index];
       const platform = document.getElementById(`platform-${index}`).value;
       const repeat = document.getElementById(`repeat-${index}`).value;
       const date = document.getElementById(`date-${index}`).value;
       const time = document.getElementById(`time-${index}`).value;
       const msg = document.getElementById(`schedule-message-${index}`);
 
-      msg.textContent = `Scheduling preview saved for ${platform} on ${date || "a selected date"} at ${time || "a selected time"} (${repeat}). Full automation coming soon.`;
-      console.log("FAKE_SCHEDULE_CREATED", { platform, repeat, date, time });
+      try {
+        const res = await fetch(`${API_BASE_URL}/schedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postText, platform, date, time, repeat })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          msg.textContent = data.error || "Failed to save schedule.";
+          return;
+        }
+
+        msg.textContent = `Saved to ${platform}${date ? ` for ${date}` : ""}${time ? ` at ${time}` : ""}.`;
+        await loadScheduled();
+      } catch (error) {
+        console.error(error);
+        msg.textContent = "Error saving schedule.";
+      }
     }
 
     async function copyAllPosts() {
@@ -777,7 +922,66 @@
       }
     }
 
+    async function loadHistory() {
+      const historyList = document.getElementById("historyList");
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/posts`);
+        const data = await res.json();
+
+        if (!res.ok || !Array.isArray(data) || !data.length) {
+          historyList.innerHTML = '<div class="mini-item"><div class="mini-item-text">No post history yet.</div></div>';
+          return;
+        }
+
+        historyList.innerHTML = data.slice(0, 3).map(item => `
+          <div class="mini-item">
+            <div class="mini-item-title">${escapeHtml(item.topic || 'Untitled')}</div>
+            <div class="mini-item-text">${escapeHtml((item.posts && item.posts[0]) || 'No post available.')}</div>
+            <div class="mini-item-meta">${escapeHtml(item.tone || 'tone')} • ${escapeHtml(item.type || 'type')}</div>
+          </div>
+        `).join("");
+      } catch (error) {
+        historyList.innerHTML = '<div class="mini-item"><div class="mini-item-text">Could not load history.</div></div>';
+      }
+    }
+
+    async function loadScheduled() {
+      const scheduledList = document.getElementById("scheduledList");
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/scheduled`);
+        const data = await res.json();
+
+        if (!res.ok || !Array.isArray(data) || !data.length) {
+          scheduledList.innerHTML = '<div class="mini-item"><div class="mini-item-text">No scheduled posts yet.</div></div>';
+          return;
+        }
+
+        scheduledList.innerHTML = data.slice(0, 3).map(item => `
+          <div class="mini-item">
+            <div class="mini-item-title">${escapeHtml(item.platform || 'Channel')}</div>
+            <div class="mini-item-text">${escapeHtml(item.postText || 'No post text.')}</div>
+            <div class="mini-item-meta">${escapeHtml(item.date || 'No date')} ${escapeHtml(item.time || '')} • ${escapeHtml(item.repeat || 'One time')}</div>
+          </div>
+        `).join("");
+      } catch (error) {
+        scheduledList.innerHTML = '<div class="mini-item"><div class="mini-item-text">Could not load scheduled posts.</div></div>';
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
     updateUsageUI();
+    loadHistory();
+    loadScheduled();
   </script>
 </body>
 </html>
