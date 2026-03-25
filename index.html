@@ -19,7 +19,7 @@
     }
 
     .container {
-      max-width: 850px;
+      max-width: 980px;
       margin: 0 auto;
     }
 
@@ -40,8 +40,12 @@
       margin-bottom: 20px;
     }
 
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
     h1 {
-      margin: 0 0 8px;
+      margin-bottom: 8px;
       font-size: 32px;
     }
 
@@ -60,6 +64,10 @@
       font-weight: bold;
     }
 
+    .section {
+      margin-top: 20px;
+    }
+
     .grid {
       display: grid;
       gap: 16px;
@@ -67,9 +75,20 @@
       margin-bottom: 18px;
     }
 
+    .platform-grid,
+    .results {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+    }
+
     @media (min-width: 700px) {
       .grid {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .platform-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
@@ -123,11 +142,14 @@
       transform: translateY(-1px);
     }
 
-    .status {
-      min-height: 24px;
-      margin: 14px 0 4px;
-      color: #93c5fd;
-      font-size: 14px;
+    .secondary-btn {
+      background: transparent;
+      color: #f9fafb;
+      border: 1px solid #4b5563;
+    }
+
+    .secondary-btn:hover {
+      background: #111827;
     }
 
     .actions {
@@ -137,32 +159,63 @@
       margin-top: 8px;
     }
 
-    .secondary-btn {
-      background: transparent;
-      color: #f9fafb;
-      border: 1px solid #4b5563;
+    .status {
+      min-height: 24px;
+      margin: 14px 0 4px;
+      color: #93c5fd;
+      font-size: 14px;
     }
 
-    .results {
-      margin-top: 20px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .post-card {
+    .usage-box,
+    .platform-card,
+    .feature-card,
+    .post-card,
+    .paywall,
+    .schedule-panel {
       background: #111827;
       border: 1px solid #374151;
       border-radius: 14px;
       padding: 16px;
     }
 
+    .platform-card h3,
+    .feature-card h3 {
+      margin-bottom: 8px;
+    }
+
+    .muted {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .connected-status {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #1f2937;
+      color: #cbd5e1;
+      border: 1px solid #374151;
+    }
+
     .post-text {
       margin: 0 0 14px;
       line-height: 1.5;
       color: #f3f4f6;
+      white-space: pre-wrap;
     }
 
-    .copy-btn {
+    .post-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .copy-btn,
+    .schedule-btn,
+    .connect-btn {
       background: transparent;
       color: #f9fafb;
       border: 1px solid #4b5563;
@@ -173,7 +226,8 @@
     }
 
     .copy-btn:hover,
-    .secondary-btn:hover {
+    .schedule-btn:hover,
+    .connect-btn:hover {
       background: #1f2937;
     }
 
@@ -183,40 +237,16 @@
       font-size: 13px;
     }
 
-    .usage-box {
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 12px;
-      background: #111827;
-      border: 1px solid #374151;
-      color: #d1d5db;
-      font-size: 14px;
-    }
-
     .paywall {
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 16px;
-      background: #0f172a;
-      border: 1px solid #374151;
       display: none;
-    }
-
-    .paywall h2 {
-      margin-top: 0;
-      margin-bottom: 8px;
-    }
-
-    .paywall p {
-      color: #cbd5e1;
-      line-height: 1.5;
+      margin-top: 20px;
     }
 
     .plan-box {
       margin: 16px 0;
       padding: 16px;
       border-radius: 14px;
-      background: #111827;
+      background: #0b1220;
       border: 1px solid #374151;
     }
 
@@ -234,6 +264,41 @@
     .hidden {
       display: none;
     }
+
+    .schedule-panel {
+      display: none;
+      margin-top: 12px;
+    }
+
+    .schedule-header {
+      font-size: 14px;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    .inline-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 700px) {
+      .inline-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .banner {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #0b1220;
+      border: 1px solid #374151;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -247,7 +312,44 @@
         <div class="badge">MVP</div>
       </div>
 
-      <div id="appContent">
+      <div class="section">
+        <h2>Connected Accounts</h2>
+        <div class="platform-grid">
+          <div class="platform-card">
+            <h3>Instagram</h3>
+            <p class="muted">Connect your Instagram business account to publish and schedule captions.</p>
+            <button class="connect-btn" onclick="fakeConnect('Instagram')">Connect Instagram</button>
+            <div class="connected-status">Preview only</div>
+          </div>
+
+          <div class="platform-card">
+            <h3>Facebook</h3>
+            <p class="muted">Link your Facebook Page for direct posting and campaign scheduling.</p>
+            <button class="connect-btn" onclick="fakeConnect('Facebook')">Connect Facebook</button>
+            <div class="connected-status">Preview only</div>
+          </div>
+
+          <div class="platform-card">
+            <h3>TikTok</h3>
+            <p class="muted">Plan nightlife promos and draft social content for short-form posting.</p>
+            <button class="connect-btn" onclick="fakeConnect('TikTok')">Connect TikTok</button>
+            <div class="connected-status">Preview only</div>
+          </div>
+
+          <div class="platform-card">
+            <h3>X</h3>
+            <p class="muted">Schedule punchy short-form promos and event reminders.</p>
+            <button class="connect-btn" onclick="fakeConnect('X')">Connect X</button>
+            <div class="connected-status">Preview only</div>
+          </div>
+        </div>
+
+        <div id="connectMessage" class="banner">Social account connections are shown as a preview right now.</div>
+      </div>
+
+      <div id="appContent" class="section">
+        <h2>Create Captions</h2>
+
         <div class="grid">
           <div class="field full">
             <label for="topic">Topic</label>
@@ -286,17 +388,17 @@
 
         <div id="status" class="status"></div>
         <div id="results" class="results"></div>
-        <div class="footer-note">Tip: use Copy All for a quick batch of captions.</div>
+        <div class="footer-note">Tip: each post now includes a Schedule option so users can preview a more complete product flow.</div>
       </div>
 
       <div id="paywall" class="paywall">
         <h2>Unlock GhostWriter Pro</h2>
-        <p>You’ve used your free generations for today. Upgrade to get unlimited caption generations, faster content testing, and a smoother workflow for your business.</p>
+        <p>You’ve used your free generations for today. Upgrade to get unlimited caption generations, account connections, and scheduling tools.</p>
 
         <div class="plan-box">
           <div>GhostWriter Pro</div>
           <div class="price">$9<span class="small">/month</span></div>
-          <p class="small">Unlimited generations • Built for bars, restaurants, and events</p>
+          <p class="small">Unlimited generations • social account connections • scheduling preview • built for bars, restaurants, and events</p>
         </div>
 
         <div class="actions">
@@ -350,13 +452,19 @@
         paywall.style.display = "block";
       } else {
         appContent.classList.remove("hidden");
-        paywall.style.display = "none";
+        paywall.style.display = "block";
       }
+    }
+
+    function fakeConnect(platform) {
+      const msg = document.getElementById("connectMessage");
+      msg.textContent = `${platform} connection preview clicked. Full social connection support is coming soon.`;
+      console.log(`FAKE_CONNECT_${platform.toUpperCase()}`);
     }
 
     function handleUpgradeClick() {
       const msg = document.getElementById("upgradeMessage");
-      msg.textContent = "Upgrade flow coming soon. For now, this tells us people are interested.";
+      msg.textContent = "Upgrade flow coming soon. This helps validate purchase intent.";
       console.log("FAKE_PAYWALL_CLICKED");
     }
 
@@ -381,6 +489,7 @@
 
       if (getRemainingUses() <= 0) {
         updateUsageUI();
+        status.textContent = "Free limit reached.";
         return;
       }
 
@@ -411,12 +520,11 @@
 
         const newUsage = getUsageCount() + 1;
         setUsageCount(newUsage);
-        updateUsageUI();
 
         latestPosts = data.posts;
         status.textContent = "Done.";
 
-        data.posts.forEach(post => {
+        data.posts.forEach((post, index) => {
           const card = document.createElement("div");
           card.className = "post-card";
 
@@ -424,10 +532,13 @@
           text.className = "post-text";
           text.textContent = post;
 
-          const button = document.createElement("button");
-          button.className = "copy-btn";
-          button.textContent = "Copy";
-          button.onclick = async () => {
+          const actionRow = document.createElement("div");
+          actionRow.className = "post-actions";
+
+          const copyButton = document.createElement("button");
+          copyButton.className = "copy-btn";
+          copyButton.textContent = "Copy";
+          copyButton.onclick = async () => {
             try {
               await navigator.clipboard.writeText(post);
               status.textContent = "Copied.";
@@ -436,20 +547,87 @@
             }
           };
 
+          const scheduleButton = document.createElement("button");
+          scheduleButton.className = "schedule-btn";
+          scheduleButton.textContent = "Schedule";
+          scheduleButton.onclick = () => toggleSchedulePanel(index);
+
+          actionRow.appendChild(copyButton);
+          actionRow.appendChild(scheduleButton);
+
+          const schedulePanel = document.createElement("div");
+          schedulePanel.className = "schedule-panel";
+          schedulePanel.id = `schedule-panel-${index}`;
+          schedulePanel.innerHTML = `
+            <div class="schedule-header">Schedule this post</div>
+            <div class="inline-grid">
+              <div class="field">
+                <label>Platform</label>
+                <select id="platform-${index}">
+                  <option>Instagram</option>
+                  <option>Facebook</option>
+                  <option>TikTok</option>
+                  <option>X</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Repeat</label>
+                <select id="repeat-${index}">
+                  <option>One time</option>
+                  <option>Daily</option>
+                  <option>Weekly</option>
+                </select>
+              </div>
+            </div>
+            <div class="inline-grid">
+              <div class="field">
+                <label>Date</label>
+                <input id="date-${index}" type="date" />
+              </div>
+              <div class="field">
+                <label>Time</label>
+                <input id="time-${index}" type="time" />
+              </div>
+            </div>
+            <div class="actions">
+              <button onclick="fakeSchedule(${index})">Schedule Post</button>
+              <button class="secondary-btn" onclick="hideSchedulePanel(${index})">Cancel</button>
+            </div>
+            <div class="small" id="schedule-message-${index}"></div>
+          `;
+
           card.appendChild(text);
-          card.appendChild(button);
+          card.appendChild(actionRow);
+          card.appendChild(schedulePanel);
           results.appendChild(card);
         });
 
-        if (getRemainingUses() <= 0) {
-          setTimeout(() => {
-            updateUsageUI();
-          }, 1200);
-        }
+        updateUsageUI();
       } catch (error) {
         console.error(error);
         status.textContent = "Could not connect to the server.";
       }
+    }
+
+    function toggleSchedulePanel(index) {
+      const panel = document.getElementById(`schedule-panel-${index}`);
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    }
+
+    function hideSchedulePanel(index) {
+      const panel = document.getElementById(`schedule-panel-${index}`);
+      panel.style.display = "none";
+    }
+
+    function fakeSchedule(index) {
+      const platform = document.getElementById(`platform-${index}`).value;
+      const repeat = document.getElementById(`repeat-${index}`).value;
+      const date = document.getElementById(`date-${index}`).value;
+      const time = document.getElementById(`time-${index}`).value;
+      const msg = document.getElementById(`schedule-message-${index}`);
+
+      msg.textContent = `Scheduling preview saved for ${platform} on ${date || "a selected date"} at ${time || "a selected time"} (${repeat}). Full automation coming soon.`;
+      console.log("FAKE_SCHEDULE_CREATED", { platform, repeat, date, time });
     }
 
     async function copyAllPosts() {
