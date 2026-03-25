@@ -81,13 +81,13 @@ function parsePostsFromOutput(outputText) {
 }
 
 app.get("/", (req, res) => {
-  res.send("Inkora Social API is live");
+  res.send("Inkova Social API is live");
 });
 
 app.get("/health", (req, res) => {
   res.json({
     ok: true,
-    service: "Inkora Social API",
+    service: "Inkova Social API",
     time: new Date().toISOString()
   });
 });
@@ -290,5 +290,5 @@ app.get("/scheduled", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Inkora Social API running on port ${PORT}`);
+  console.log(`Inkova Social API running on port ${PORT}`);
 });
