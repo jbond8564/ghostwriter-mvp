@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GhostWriter Social</title>
+  <title>Quillor</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,84 +12,177 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #111827;
-      color: #f9fafb;
+      background: #0b1220;
+      color: #f8fafc;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 280px 1fr;
       min-height: 100vh;
-      padding: 32px 16px;
     }
 
-    .container {
-      max-width: 980px;
-      margin: 0 auto;
+    .sidebar {
+      background: #111827;
+      border-right: 1px solid #1f2937;
+      padding: 24px 18px;
     }
 
-    .card {
-      background: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    .brand {
+      margin-bottom: 24px;
     }
 
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
+    .brand h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
     }
 
-    h1, h2, h3 {
-      margin-top: 0;
-    }
-
-    h1 {
-      margin-bottom: 8px;
-      font-size: 32px;
-    }
-
-    .subtitle {
+    .brand p {
       margin: 0;
-      color: #9ca3af;
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .sidebar-section {
+      margin-top: 24px;
+    }
+
+    .sidebar-section h2 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .mini-card {
+      background: #0f172a;
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .mini-card h3 {
+      margin: 0 0 6px;
       font-size: 15px;
     }
 
-    .badge {
-      font-size: 12px;
-      color: #111827;
-      background: #93c5fd;
+    .mini-card p {
+      margin: 0 0 10px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .status-pill {
+      display: inline-block;
       padding: 6px 10px;
       border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #172033;
+      color: #cbd5e1;
+      border: 1px solid #253149;
+    }
+
+    .connect-btn,
+    .ghost-btn,
+    .action-btn,
+    .primary-btn,
+    .copy-btn,
+    .schedule-btn {
+      border: 1px solid #334155;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .connect-btn,
+    .ghost-btn,
+    .copy-btn,
+    .schedule-btn {
+      background: transparent;
+      color: #f8fafc;
+      padding: 10px 12px;
+    }
+
+    .connect-btn:hover,
+    .ghost-btn:hover,
+    .copy-btn:hover,
+    .schedule-btn:hover {
+      background: #162033;
+    }
+
+    .main {
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .topbar h2 {
+      margin: 0 0 6px;
+      font-size: 30px;
+    }
+
+    .topbar p {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .badge {
+      background: #93c5fd;
+      color: #111827;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
       font-weight: bold;
     }
 
-    .section {
-      margin-top: 20px;
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .panel-subtitle {
+      margin: 0 0 18px;
+      color: #94a3b8;
+      font-size: 14px;
     }
 
     .grid {
       display: grid;
       gap: 16px;
-      grid-template-columns: 1fr;
-      margin-bottom: 18px;
+      grid-template-columns: 1fr 1fr;
     }
 
-    .platform-grid,
-    .results {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: 1fr;
-    }
-
-    @media (min-width: 700px) {
-      .grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .platform-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    .field.full {
+      grid-column: 1 / -1;
     }
 
     .field {
@@ -98,112 +191,110 @@
       gap: 8px;
     }
 
-    .field.full {
-      grid-column: 1 / -1;
-    }
-
     label {
       font-size: 14px;
-      color: #d1d5db;
       font-weight: bold;
-    }
-
-    input,
-    select,
-    button {
-      border-radius: 12px;
-      border: 1px solid #4b5563;
-      font-size: 16px;
+      color: #e2e8f0;
     }
 
     input,
     select {
       width: 100%;
       padding: 14px;
-      background: #111827;
-      color: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 15px;
     }
 
     input::placeholder {
-      color: #6b7280;
+      color: #64748b;
     }
 
-    button {
-      padding: 14px 18px;
-      background: #f9fafb;
+    .button-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .primary-btn {
+      background: #f8fafc;
       color: #111827;
+      padding: 12px 16px;
       font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s ease;
     }
 
-    button:hover {
+    .primary-btn:hover {
       opacity: 0.92;
       transform: translateY(-1px);
     }
 
-    .secondary-btn {
-      background: transparent;
-      color: #f9fafb;
-      border: 1px solid #4b5563;
-    }
-
-    .secondary-btn:hover {
-      background: #111827;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-
-    .status {
-      min-height: 24px;
-      margin: 14px 0 4px;
-      color: #93c5fd;
-      font-size: 14px;
+    .ghost-btn {
+      padding: 12px 16px;
     }
 
     .usage-box,
-    .platform-card,
-    .feature-card,
-    .post-card,
-    .paywall,
-    .schedule-panel {
-      background: #111827;
-      border: 1px solid #374151;
+    .plan-box,
+    .preview-box {
+      background: #0f172a;
+      border: 1px solid #1f2937;
       border-radius: 14px;
       padding: 16px;
+      margin-bottom: 14px;
     }
 
-    .platform-card h3,
-    .feature-card h3 {
-      margin-bottom: 8px;
+    .usage-number {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 8px;
     }
 
     .muted {
-      color: #9ca3af;
+      color: #94a3b8;
       font-size: 14px;
+      line-height: 1.5;
     }
 
-    .connected-status {
-      display: inline-block;
-      margin-top: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
+    .price {
+      font-size: 30px;
       font-weight: bold;
-      background: #1f2937;
-      color: #cbd5e1;
-      border: 1px solid #374151;
+      margin: 10px 0;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .status {
+      min-height: 22px;
+      margin-top: 14px;
+      font-size: 14px;
+      color: #93c5fd;
+    }
+
+    .results-panel {
+      margin-top: 20px;
+    }
+
+    .results-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .post-card {
+      background: #0f172a;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 16px;
     }
 
     .post-text {
       margin: 0 0 14px;
-      line-height: 1.5;
-      color: #f3f4f6;
+      line-height: 1.6;
+      color: #f8fafc;
       white-space: pre-wrap;
     }
 
@@ -213,202 +304,226 @@
       flex-wrap: wrap;
     }
 
-    .copy-btn,
-    .schedule-btn,
-    .connect-btn {
-      background: transparent;
-      color: #f9fafb;
-      border: 1px solid #4b5563;
-      padding: 10px 14px;
-      border-radius: 10px;
-      cursor: pointer;
+    .schedule-panel {
+      display: none;
+      margin-top: 14px;
+      background: #0b1220;
+      border: 1px solid #243146;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .schedule-title {
+      margin: 0 0 12px;
       font-size: 14px;
+      font-weight: bold;
+      color: #dbeafe;
     }
 
-    .copy-btn:hover,
-    .schedule-btn:hover,
-    .connect-btn:hover {
-      background: #1f2937;
+    .schedule-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+      margin-bottom: 12px;
     }
 
-    .footer-note {
-      margin-top: 18px;
-      color: #9ca3af;
-      font-size: 13px;
+    .banner {
+      margin-top: 14px;
+      background: #0f172a;
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 14px;
+      color: #cbd5e1;
+      font-size: 14px;
     }
 
     .paywall {
       display: none;
-      margin-top: 20px;
-    }
-
-    .plan-box {
-      margin: 16px 0;
-      padding: 16px;
-      border-radius: 14px;
-      background: #0b1220;
-      border: 1px solid #374151;
-    }
-
-    .price {
-      font-size: 28px;
-      font-weight: bold;
-      margin: 8px 0;
-    }
-
-    .small {
-      color: #9ca3af;
-      font-size: 13px;
+      margin-top: 18px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 18px;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
-    .schedule-panel {
-      display: none;
-      margin-top: 12px;
-    }
+    @media (max-width: 980px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
 
-    .schedule-header {
-      font-size: 14px;
-      color: #cbd5e1;
-      margin-bottom: 12px;
-      font-weight: bold;
-    }
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid #1f2937;
+      }
 
-    .inline-grid {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: 1fr;
-      margin-bottom: 12px;
-    }
-
-    @media (min-width: 700px) {
-      .inline-grid {
-        grid-template-columns: 1fr 1fr;
+      .content-grid {
+        grid-template-columns: 1fr;
       }
     }
 
-    .banner {
-      margin-top: 16px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: #0b1220;
-      border: 1px solid #374151;
-      color: #cbd5e1;
-      font-size: 14px;
+    @media (max-width: 700px) {
+      .grid,
+      .schedule-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .sidebar {
+        padding: 18px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <div class="header-row">
-        <div>
-          <h1>GhostWriter Social</h1>
-          <p class="subtitle">AI social captions for bars, restaurants, and events.</p>
-        </div>
-        <div class="badge">MVP</div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>GhostWriter</h1>
+        <p>Create captions, preview connected accounts, and show users a more complete product vision.</p>
       </div>
 
-      <div class="section">
+      <div class="sidebar-section">
         <h2>Connected Accounts</h2>
-        <div class="platform-grid">
-          <div class="platform-card">
-            <h3>Instagram</h3>
-            <p class="muted">Connect your Instagram business account to publish and schedule captions.</p>
-            <button class="connect-btn" onclick="fakeConnect('Instagram')">Connect Instagram</button>
-            <div class="connected-status">Preview only</div>
-          </div>
 
-          <div class="platform-card">
-            <h3>Facebook</h3>
-            <p class="muted">Link your Facebook Page for direct posting and campaign scheduling.</p>
-            <button class="connect-btn" onclick="fakeConnect('Facebook')">Connect Facebook</button>
-            <div class="connected-status">Preview only</div>
-          </div>
-
-          <div class="platform-card">
-            <h3>TikTok</h3>
-            <p class="muted">Plan nightlife promos and draft social content for short-form posting.</p>
-            <button class="connect-btn" onclick="fakeConnect('TikTok')">Connect TikTok</button>
-            <div class="connected-status">Preview only</div>
-          </div>
-
-          <div class="platform-card">
-            <h3>X</h3>
-            <p class="muted">Schedule punchy short-form promos and event reminders.</p>
-            <button class="connect-btn" onclick="fakeConnect('X')">Connect X</button>
-            <div class="connected-status">Preview only</div>
-          </div>
+        <div class="mini-card">
+          <h3>Instagram</h3>
+          <p>Schedule promos and publish caption-ready content for business accounts.</p>
+          <button class="connect-btn" onclick="fakeConnect('Instagram')">Connect</button>
+          <div style="margin-top:10px;"><span class="status-pill">Preview only</span></div>
         </div>
 
-        <div id="connectMessage" class="banner">Social account connections are shown as a preview right now.</div>
+        <div class="mini-card">
+          <h3>Facebook</h3>
+          <p>Preview Page posting workflows for events, specials, and recurring promos.</p>
+          <button class="connect-btn" onclick="fakeConnect('Facebook')">Connect</button>
+          <div style="margin-top:10px;"><span class="status-pill">Preview only</span></div>
+        </div>
+
+        <div class="mini-card">
+          <h3>TikTok</h3>
+          <p>Show creators and venues what a short-form workflow could look like.</p>
+          <button class="connect-btn" onclick="fakeConnect('TikTok')">Connect</button>
+          <div style="margin-top:10px;"><span class="status-pill">Preview only</span></div>
+        </div>
+
+        <div class="mini-card">
+          <h3>X</h3>
+          <p>Preview short-form promo scheduling for announcements and reminders.</p>
+          <button class="connect-btn" onclick="fakeConnect('X')">Connect</button>
+          <div style="margin-top:10px;"><span class="status-pill">Preview only</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2>GhostWriter Social</h2>
+          <p>AI social captions for bars, restaurants, nightlife, and events.</p>
+        </div>
+        <div class="badge">Product Preview</div>
       </div>
 
-      <div id="appContent" class="section">
-        <h2>Create Captions</h2>
+      <div class="content-grid">
+        <section>
+          <div id="generatorPanel" class="panel">
+            <h3>Create Captions</h3>
+            <p class="panel-subtitle">Generate content, preview scheduling, and test premium intent without building full automation yet.</p>
 
-        <div class="grid">
-          <div class="field full">
-            <label for="topic">Topic</label>
-            <input id="topic" type="text" placeholder="Spicy margarita, taco night, live DJ event, happy hour" />
+            <div class="grid">
+              <div class="field full">
+                <label for="topic">Topic</label>
+                <input id="topic" type="text" placeholder="Spicy margarita, taco night, live DJ event, happy hour, Friday special" />
+              </div>
+
+              <div class="field">
+                <label for="tone">Tone</label>
+                <select id="tone">
+                  <option value="funny">Funny</option>
+                  <option value="edgy">Edgy</option>
+                  <option value="professional">Professional</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="type">Content Type</label>
+                <select id="type">
+                  <option value="drink">Drink Promo</option>
+                  <option value="food">Food Special</option>
+                  <option value="event">Event Promotion</option>
+                  <option value="happy-hour">Happy Hour</option>
+                  <option value="weekend-special">Weekend Special</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button class="primary-btn" onclick="generatePosts()">Generate Posts</button>
+              <button class="ghost-btn" onclick="copyAllPosts()">Copy All</button>
+            </div>
+
+            <div id="status" class="status"></div>
+
+            <div class="results-panel">
+              <div id="results" class="results-list"></div>
+            </div>
           </div>
 
-          <div class="field">
-            <label for="tone">Tone</label>
-            <select id="tone">
-              <option value="funny">Funny</option>
-              <option value="edgy">Edgy</option>
-              <option value="professional">Professional</option>
-            </select>
+          <div id="paywall" class="paywall">
+            <h3>Unlock GhostWriter Pro</h3>
+            <p class="muted">You’ve used your free generations for today. Upgrade to unlock unlimited generations, scheduling tools, and social account workflows.</p>
+
+            <div class="plan-box">
+              <div>GhostWriter Pro</div>
+              <div class="price">$9<span class="small">/month</span></div>
+              <div class="small">Unlimited generations • scheduling preview • account workflows • bars, restaurants, and events</div>
+            </div>
+
+            <div class="button-row">
+              <button class="primary-btn" onclick="handleUpgradeClick()">Upgrade to Pro</button>
+              <button class="ghost-btn" onclick="resetFreeLimit()">Reset Demo Limit</button>
+            </div>
+
+            <div id="upgradeMessage" class="status"></div>
           </div>
+        </section>
 
-          <div class="field">
-            <label for="type">Content Type</label>
-            <select id="type">
-              <option value="drink">Drink Promo</option>
-              <option value="food">Food Special</option>
-              <option value="event">Event Promotion</option>
-              <option value="happy-hour">Happy Hour</option>
-              <option value="weekend-special">Weekend Special</option>
-            </select>
+        <section>
+          <div class="panel">
+            <h3>Workspace</h3>
+            <p class="panel-subtitle">Use this column to make the app feel more complete and premium.</p>
+
+            <div class="usage-box">
+              <div class="small">Free usage today</div>
+              <div id="usageNumber" class="usage-number">3</div>
+              <div id="usageText" class="muted">3 generations left today</div>
+            </div>
+
+            <div class="plan-box">
+              <div class="small">Current plan</div>
+              <div style="font-size:20px; font-weight:bold; margin-top:8px;">Free Plan</div>
+              <div class="muted" style="margin-top:8px;">Generate captions, copy posts, and preview premium workflows.</div>
+            </div>
+
+            <div class="preview-box">
+              <h3 style="font-size:16px; margin-bottom:8px;">Scheduling Preview</h3>
+              <p class="muted">Each caption includes a fake schedule flow so users can picture auto-posting without you building the real backend yet.</p>
+            </div>
+
+            <div id="connectMessage" class="banner">
+              Social account connections are preview-only right now.
+            </div>
           </div>
-        </div>
-
-        <div class="actions">
-          <button onclick="generatePosts()">Generate Posts</button>
-          <button class="secondary-btn" onclick="copyAllPosts()">Copy All</button>
-        </div>
-
-        <div class="usage-box">
-          <span id="usageText">Free generations left today: 3</span>
-        </div>
-
-        <div id="status" class="status"></div>
-        <div id="results" class="results"></div>
-        <div class="footer-note">Tip: each post now includes a Schedule option so users can preview a more complete product flow.</div>
+        </section>
       </div>
-
-      <div id="paywall" class="paywall">
-        <h2>Unlock GhostWriter Pro</h2>
-        <p>You’ve used your free generations for today. Upgrade to get unlimited caption generations, account connections, and scheduling tools.</p>
-
-        <div class="plan-box">
-          <div>GhostWriter Pro</div>
-          <div class="price">$9<span class="small">/month</span></div>
-          <p class="small">Unlimited generations • social account connections • scheduling preview • built for bars, restaurants, and events</p>
-        </div>
-
-        <div class="actions">
-          <button onclick="handleUpgradeClick()">Upgrade to Pro</button>
-          <button class="secondary-btn" onclick="resetFreeLimit()">Reset Demo Limit</button>
-        </div>
-
-        <p id="upgradeMessage" class="small"></p>
-      </div>
-    </div>
+    </main>
   </div>
 
   <script>
@@ -431,8 +546,7 @@
     }
 
     function setUsageCount(count) {
-      const key = getTodayKey();
-      localStorage.setItem(key, String(count));
+      localStorage.setItem(getTodayKey(), String(count));
     }
 
     function getRemainingUses() {
@@ -440,19 +554,21 @@
     }
 
     function updateUsageUI() {
-      const usageText = document.getElementById("usageText");
-      const appContent = document.getElementById("appContent");
-      const paywall = document.getElementById("paywall");
       const remaining = getRemainingUses();
+      const usageNumber = document.getElementById("usageNumber");
+      const usageText = document.getElementById("usageText");
+      const generatorPanel = document.getElementById("generatorPanel");
+      const paywall = document.getElementById("paywall");
 
-      usageText.textContent = `Free generations left today: ${remaining}`;
+      usageNumber.textContent = remaining;
+      usageText.textContent = `${remaining} generations left today`;
 
       if (remaining <= 0) {
-        appContent.classList.add("hidden");
+        generatorPanel.classList.add("hidden");
         paywall.style.display = "block";
       } else {
-        appContent.classList.remove("hidden");
-        paywall.style.display = "block";
+        generatorPanel.classList.remove("hidden");
+        paywall.style.display = "none";
       }
     }
 
@@ -464,7 +580,7 @@
 
     function handleUpgradeClick() {
       const msg = document.getElementById("upgradeMessage");
-      msg.textContent = "Upgrade flow coming soon. This helps validate purchase intent.";
+      msg.textContent = "Upgrade flow coming soon. This click helps validate purchase intent.";
       console.log("FAKE_PAYWALL_CLICKED");
     }
 
@@ -518,9 +634,7 @@
           return;
         }
 
-        const newUsage = getUsageCount() + 1;
-        setUsageCount(newUsage);
-
+        setUsageCount(getUsageCount() + 1);
         latestPosts = data.posts;
         status.textContent = "Done.";
 
@@ -532,8 +646,8 @@
           text.className = "post-text";
           text.textContent = post;
 
-          const actionRow = document.createElement("div");
-          actionRow.className = "post-actions";
+          const actions = document.createElement("div");
+          actions.className = "post-actions";
 
           const copyButton = document.createElement("button");
           copyButton.className = "copy-btn";
@@ -552,15 +666,15 @@
           scheduleButton.textContent = "Schedule";
           scheduleButton.onclick = () => toggleSchedulePanel(index);
 
-          actionRow.appendChild(copyButton);
-          actionRow.appendChild(scheduleButton);
+          actions.appendChild(copyButton);
+          actions.appendChild(scheduleButton);
 
           const schedulePanel = document.createElement("div");
           schedulePanel.className = "schedule-panel";
           schedulePanel.id = `schedule-panel-${index}`;
           schedulePanel.innerHTML = `
-            <div class="schedule-header">Schedule this post</div>
-            <div class="inline-grid">
+            <div class="schedule-title">Schedule this post</div>
+            <div class="schedule-grid">
               <div class="field">
                 <label>Platform</label>
                 <select id="platform-${index}">
@@ -578,8 +692,6 @@
                   <option>Weekly</option>
                 </select>
               </div>
-            </div>
-            <div class="inline-grid">
               <div class="field">
                 <label>Date</label>
                 <input id="date-${index}" type="date" />
@@ -589,15 +701,15 @@
                 <input id="time-${index}" type="time" />
               </div>
             </div>
-            <div class="actions">
-              <button onclick="fakeSchedule(${index})">Schedule Post</button>
-              <button class="secondary-btn" onclick="hideSchedulePanel(${index})">Cancel</button>
+            <div class="button-row">
+              <button class="primary-btn" onclick="fakeSchedule(${index})">Schedule Post</button>
+              <button class="ghost-btn" onclick="hideSchedulePanel(${index})">Cancel</button>
             </div>
-            <div class="small" id="schedule-message-${index}"></div>
+            <div class="small" id="schedule-message-${index}" style="margin-top:10px;"></div>
           `;
 
           card.appendChild(text);
-          card.appendChild(actionRow);
+          card.appendChild(actions);
           card.appendChild(schedulePanel);
           results.appendChild(card);
         });
@@ -615,8 +727,7 @@
     }
 
     function hideSchedulePanel(index) {
-      const panel = document.getElementById(`schedule-panel-${index}`);
-      panel.style.display = "none";
+      document.getElementById(`schedule-panel-${index}`).style.display = "none";
     }
 
     function fakeSchedule(index) {
