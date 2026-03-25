@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inkora Social</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     :root {
       --bg: #08101d;
       --panel: #0f1728;
       --panel-2: #121c31;
       --panel-3: #0b1423;
-      --border: #22314a;
+      --border: #20304b;
       --border-soft: #18253a;
       --text: #f8fafc;
       --muted: #94a3b8;
@@ -20,18 +22,19 @@
       --accent: #dbeafe;
       --accent-strong: #f8fafc;
       --accent-text: #0f172a;
-      --success: #86efac;
-      --warning: #fde68a;
-      --danger: #fca5a5;
       --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+      --radius-xl: 22px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 12px;
     }
 
     body {
       margin: 0;
       font-family: Inter, Arial, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(147, 197, 253, 0.08), transparent 26%),
-        radial-gradient(circle at top right, rgba(255, 255, 255, 0.03), transparent 22%),
+        radial-gradient(circle at top left, rgba(147, 197, 253, 0.09), transparent 26%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.04), transparent 20%),
         var(--bg);
       color: var(--text);
     }
@@ -54,7 +57,7 @@
       padding: 18px;
       background: linear-gradient(180deg, rgba(17, 28, 48, 0.95), rgba(10, 18, 32, 0.95));
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: var(--radius-lg);
       box-shadow: var(--shadow);
     }
 
@@ -87,7 +90,9 @@
       line-height: 1.6;
     }
 
-    .sidebar-section { margin-top: 26px; }
+    .sidebar-section {
+      margin-top: 26px;
+    }
 
     .sidebar-section h2 {
       margin: 0 0 12px;
@@ -113,7 +118,10 @@
       margin-bottom: 8px;
     }
 
-    .mini-card h3 { margin: 0; font-size: 15px; }
+    .mini-card h3 {
+      margin: 0;
+      font-size: 15px;
+    }
 
     .mini-card p {
       margin: 0 0 12px;
@@ -135,15 +143,12 @@
       white-space: nowrap;
     }
 
-    .status-pill.live { color: var(--success); }
-    .status-pill.soon { color: var(--warning); }
-
     .connect-btn,
     .ghost-btn,
     .primary-btn,
     .copy-btn,
     .schedule-btn,
-    .action-link {
+    .regen-btn {
       border: 1px solid #31425f;
       border-radius: 12px;
       font-size: 14px;
@@ -156,7 +161,7 @@
     .ghost-btn,
     .copy-btn,
     .schedule-btn,
-    .action-link {
+    .regen-btn {
       background: transparent;
       color: var(--text);
       padding: 10px 12px;
@@ -166,13 +171,15 @@
     .ghost-btn:hover,
     .copy-btn:hover,
     .schedule-btn:hover,
-    .action-link:hover {
+    .regen-btn:hover {
       background: #142036;
       border-color: #415578;
       transform: translateY(-1px);
     }
 
-    .main { padding: 28px; }
+    .main {
+      padding: 28px;
+    }
 
     .topbar {
       display: flex;
@@ -194,7 +201,7 @@
       color: var(--muted);
       font-size: 15px;
       line-height: 1.6;
-      max-width: 760px;
+      max-width: 720px;
     }
 
     .badge {
@@ -216,7 +223,7 @@
     .panel {
       background: linear-gradient(180deg, rgba(15, 23, 40, 0.98), rgba(11, 19, 35, 0.98));
       border: 1px solid var(--border-soft);
-      border-radius: 22px;
+      border-radius: var(--radius-xl);
       padding: 22px;
       box-shadow: var(--shadow);
     }
@@ -241,7 +248,9 @@
       grid-template-columns: 1fr 1fr;
     }
 
-    .field.full { grid-column: 1 / -1; }
+    .field.full {
+      grid-column: 1 / -1;
+    }
 
     .field {
       display: flex;
@@ -256,7 +265,8 @@
       letter-spacing: 0.01em;
     }
 
-    input, select {
+    input,
+    select {
       width: 100%;
       padding: 14px;
       border-radius: 14px;
@@ -268,12 +278,15 @@
       transition: 0.2s ease;
     }
 
-    input:focus, select:focus {
+    input:focus,
+    select:focus {
       border-color: #6f8fbc;
       box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.08);
     }
 
-    input::placeholder { color: #64748b; }
+    input::placeholder {
+      color: #64748b;
+    }
 
     .button-row {
       display: flex;
@@ -295,7 +308,9 @@
       transform: translateY(-1px);
     }
 
-    .ghost-btn { padding: 12px 16px; }
+    .ghost-btn {
+      padding: 12px 16px;
+    }
 
     .status {
       min-height: 22px;
@@ -304,8 +319,14 @@
       color: var(--accent);
     }
 
-    .results-panel { margin-top: 22px; }
-    .results-list { display: grid; gap: 14px; }
+    .results-panel {
+      margin-top: 22px;
+    }
+
+    .results-list {
+      display: grid;
+      gap: 14px;
+    }
 
     .post-card {
       background: linear-gradient(180deg, rgba(9, 17, 31, 0.98), rgba(8, 15, 28, 0.98));
@@ -405,39 +426,6 @@
       line-height: 1.5;
     }
 
-    .mini-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .mini-item {
-      padding: 12px;
-      border-radius: 14px;
-      background: #0a1322;
-      border: 1px solid var(--border-soft);
-    }
-
-    .mini-item-title {
-      font-size: 13px;
-      color: var(--muted-2);
-      margin-bottom: 6px;
-      font-weight: 700;
-    }
-
-    .mini-item-text {
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--text);
-      white-space: pre-wrap;
-    }
-
-    .mini-item-meta {
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
     .list-box ul {
       margin: 10px 0 0;
       padding-left: 18px;
@@ -456,6 +444,47 @@
       line-height: 1.6;
     }
 
+    .sidebar-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .list-item {
+      background: rgba(9, 17, 31, 0.92);
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .list-item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .list-item-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted-2);
+    }
+
+    .list-item-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      margin: 0;
+    }
+
+    .empty-state {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     .paywall {
       display: none;
       margin-top: 18px;
@@ -466,19 +495,42 @@
       box-shadow: var(--shadow);
     }
 
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
 
     @media (max-width: 980px) {
-      .app-shell { grid-template-columns: 1fr; }
-      .sidebar { border-right: none; border-bottom: 1px solid var(--border-soft); }
-      .content-grid { grid-template-columns: 1fr; }
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border-soft);
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 700px) {
-      .grid, .schedule-grid { grid-template-columns: 1fr; }
-      .main { padding: 16px; }
-      .sidebar { padding: 18px; }
-      .topbar h2 { font-size: 28px; }
+      .grid,
+      .schedule-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .sidebar {
+        padding: 18px;
+      }
+
+      .topbar h2 {
+        font-size: 28px;
+      }
     }
   </style>
 </head>
@@ -496,26 +548,17 @@
 
         <div class="mini-card">
           <div class="mini-card-head">
-            <h3>X</h3>
-            <span class="status-pill live">Next live channel</span>
-          </div>
-          <p>Best first fit for real posting, reminders, promotions, and quick updates.</p>
-          <button class="connect-btn" onclick="fakeConnect('X')">Connect X</button>
-        </div>
-
-        <div class="mini-card">
-          <div class="mini-card-head">
             <h3>Instagram</h3>
-            <span class="status-pill soon">Coming soon</span>
+            <span class="status-pill">Coming soon</span>
           </div>
-          <p>Create promo captions and plan publishing workflows for business content.</p>
+          <p>Create promo captions and preview publishing workflows for business content.</p>
           <button class="connect-btn" onclick="fakeConnect('Instagram')">Connect Instagram</button>
         </div>
 
         <div class="mini-card">
           <div class="mini-card-head">
             <h3>Facebook</h3>
-            <span class="status-pill soon">Coming soon</span>
+            <span class="status-pill">Coming soon</span>
           </div>
           <p>Draft content for events, weekly specials, and recurring promotions.</p>
           <button class="connect-btn" onclick="fakeConnect('Facebook')">Connect Facebook</button>
@@ -524,10 +567,19 @@
         <div class="mini-card">
           <div class="mini-card-head">
             <h3>TikTok</h3>
-            <span class="status-pill soon">Coming soon</span>
+            <span class="status-pill">Coming soon</span>
           </div>
           <p>Plan short-form campaign ideas and creator-style post concepts.</p>
           <button class="connect-btn" onclick="fakeConnect('TikTok')">Connect TikTok</button>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-card-head">
+            <h3>X</h3>
+            <span class="status-pill">Next integration</span>
+          </div>
+          <p>Write quick updates, launch announcements, reminders, and promo posts.</p>
+          <button class="connect-btn" onclick="fakeConnect('X')">Connect X</button>
         </div>
       </div>
     </aside>
@@ -536,7 +588,7 @@
       <div class="topbar">
         <div>
           <h2>Inkora Social</h2>
-          <p>Generate ready-to-post social content for bars, restaurants, nightlife, and local events, then save a publishing plan in one place.</p>
+          <p>Generate ready-to-post social content, organize publishing times, and show local businesses a faster way to plan what goes live next.</p>
         </div>
         <div class="badge">Founder Demo</div>
       </div>
@@ -545,12 +597,12 @@
         <section>
           <div id="generatorPanel" class="panel">
             <h3>Create content</h3>
-            <p class="panel-subtitle">Turn a simple topic into multiple post options you can review, copy, and save into your content queue.</p>
+            <p class="panel-subtitle">Turn a simple topic into multiple post options you can review, copy, and save into a publishing workflow.</p>
 
             <div class="grid">
               <div class="field full">
                 <label for="topic">Topic</label>
-                <input id="topic" type="text" placeholder="Thursday happy hour, spicy margarita launch, taco night, live DJ Friday, weekend brunch" />
+                <input id="topic" type="text" placeholder="Spicy margarita launch, taco night, weekend brunch, live DJ set, Friday happy hour" />
               </div>
 
               <div class="field">
@@ -576,6 +628,7 @@
 
             <div class="button-row">
               <button class="primary-btn" onclick="generatePosts()">Generate Posts</button>
+              <button class="regen-btn" onclick="generatePosts()">Regenerate</button>
               <button class="ghost-btn" onclick="copyAllPosts()">Copy All</button>
             </div>
 
@@ -588,12 +641,12 @@
 
           <div id="paywall" class="paywall">
             <h3>Upgrade to Inkora Pro</h3>
-            <p class="muted">You’ve used today’s free generations. Upgrade to unlock unlimited content generation, saved publishing workflows, and connected channel tools.</p>
+            <p class="muted">You’ve used today’s free generations. Upgrade to unlock unlimited content generation, publishing workflows, and connected channel tools.</p>
 
             <div class="plan-box">
               <div class="small">Inkora Pro</div>
               <div class="price">$9<span class="small">/month</span></div>
-              <div class="small">Unlimited generations • saved schedules • connected social channels • built for hospitality, nightlife, and events</div>
+              <div class="small">Unlimited generations • publishing workflows • connected social channels • built for hospitality, nightlife, and events</div>
             </div>
 
             <div class="button-row">
@@ -608,7 +661,7 @@
         <section>
           <div class="panel">
             <h3>Workspace</h3>
-            <p class="panel-subtitle">Track usage, keep a small content history, and show owners that generated posts can be saved into a workflow.</p>
+            <p class="panel-subtitle">A clearer, more premium view of usage, plan status, and recent activity.</p>
 
             <div class="usage-box">
               <div class="small">Free usage remaining today</div>
@@ -619,39 +672,39 @@
             <div class="plan-box">
               <div class="small">Current plan</div>
               <div style="font-size: 22px; font-weight: 800; margin-top: 8px;">Free</div>
-              <div class="muted" style="margin-top: 8px;">Generate content, copy posts, and save a simple publishing queue before enabling live channel automations.</div>
+              <div class="muted" style="margin-top: 8px;">Generate content, save schedules, and validate what local businesses want before live posting is enabled.</div>
             </div>
 
             <div class="preview-box">
-              <h3 style="font-size: 17px; margin-bottom: 8px;">What to show in the meeting</h3>
-              <p class="muted">Lead with real content generation first. Then save one schedule to show how owners could organize upcoming posts without writing everything from scratch.</p>
+              <h3 style="font-size: 17px; margin-bottom: 8px;">Publishing flow</h3>
+              <p class="muted">Posts can be generated, reviewed, copied, and saved into a simple schedule workflow. Live posting is the next step after customer validation.</p>
             </div>
 
             <div class="list-box">
               <div class="small">What this MVP already proves</div>
               <ul>
-                <li>Owners can generate social-ready content from a simple prompt.</li>
-                <li>Scheduling interest can be tested with a saved posting workflow.</li>
-                <li>Upgrade intent can be measured with a lightweight paywall.</li>
+                <li>Users can generate social-ready content from a simple prompt.</li>
+                <li>Scheduling intent can be measured with real saved draft schedules.</li>
+                <li>Upgrade interest can be tracked with a lightweight paywall.</li>
               </ul>
             </div>
 
-            <div class="plan-box">
+            <div class="banner" id="connectMessage">
+              Connected channels are not live yet. Today’s demo focuses on faster content creation and schedule planning.
+            </div>
+
+            <div class="list-box">
               <div class="small">Recent schedules</div>
-              <div id="scheduledList" class="mini-list">
-                <div class="mini-item"><div class="mini-item-text">No scheduled posts yet.</div></div>
+              <div id="scheduledList" class="sidebar-list">
+                <div class="empty-state">No schedules saved yet.</div>
               </div>
             </div>
 
-            <div class="plan-box">
+            <div class="list-box">
               <div class="small">Recent generations</div>
-              <div id="historyList" class="mini-list">
-                <div class="mini-item"><div class="mini-item-text">No post history yet.</div></div>
+              <div id="historyList" class="sidebar-list">
+                <div class="empty-state">No generations yet.</div>
               </div>
-            </div>
-
-            <div id="connectMessage" class="banner">
-              Live channel publishing is rolling out in stages. For today’s demo, the strongest workflow is generating content and saving a posting plan.
             </div>
           </div>
         </section>
@@ -674,7 +727,8 @@
     }
 
     function getUsageCount() {
-      return parseInt(localStorage.getItem(getTodayKey()) || "0", 10);
+      const key = getTodayKey();
+      return parseInt(localStorage.getItem(key) || "0", 10);
     }
 
     function setUsageCount(count) {
@@ -706,20 +760,111 @@
 
     function fakeConnect(platform) {
       const msg = document.getElementById("connectMessage");
-      msg.textContent = `${platform} is on the product roadmap. Today the best workflow to show is generating content and saving a posting plan.`;
-      console.log(`CHANNEL_CLICK_${platform.toUpperCase()}`);
+      msg.textContent = `${platform} was selected. Live account linking is not enabled yet, but this helps validate which channels matter most to customers.`;
+      console.log(`CHANNEL_SELECTED_${platform.toUpperCase()}`);
     }
 
     function handleUpgradeClick() {
       const msg = document.getElementById("upgradeMessage");
       msg.textContent = "Upgrade flow coming soon. This click is being used to validate purchase intent.";
-      console.log("UPGRADE_INTENT_CLICKED");
+      console.log("UPGRADE_CLICKED");
     }
 
     function resetFreeLimit() {
       setUsageCount(0);
       document.getElementById("upgradeMessage").textContent = "";
       updateUsageUI();
+    }
+
+    function truncateText(text, max = 110) {
+      if (!text) return "";
+      return text.length > max ? `${text.slice(0, max)}...` : text;
+    }
+
+    function formatDateTime(date, time) {
+      if (!date && !time) return "Not specified";
+      if (date && time) return `${date} at ${time}`;
+      return date || time;
+    }
+
+    function renderHistory(records) {
+      const container = document.getElementById("historyList");
+
+      if (!records || !records.length) {
+        container.innerHTML = `<div class="empty-state">No generations yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = records
+        .slice(0, 5)
+        .map((record) => {
+          const preview = Array.isArray(record.posts) && record.posts.length ? record.posts[0] : "No preview available";
+          return `
+            <div class="list-item">
+              <div class="list-item-top">
+                <div class="list-item-title">${record.type || "content"} • ${record.tone || "tone"}</div>
+                <span class="status-pill">Saved</span>
+              </div>
+              <p class="list-item-text">${truncateText(preview)}</p>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function renderScheduled(items) {
+      const container = document.getElementById("scheduledList");
+
+      if (!items || !items.length) {
+        container.innerHTML = `<div class="empty-state">No schedules saved yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = items
+        .slice(0, 5)
+        .map((item) => {
+          return `
+            <div class="list-item">
+              <div class="list-item-top">
+                <div class="list-item-title">${item.platform || "Platform"} • ${item.repeat || "One time"}</div>
+                <span class="status-pill">${item.status || "Saved"}</span>
+              </div>
+              <p class="list-item-text">${truncateText(item.postText)}</p>
+              <div class="small" style="margin-top: 8px;">${formatDateTime(item.date, item.time)}</div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    async function loadHistory() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/posts`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          return;
+        }
+
+        renderHistory(data.posts || []);
+      } catch (error) {
+        console.error("History load error:", error);
+      }
+    }
+
+    async function loadScheduled() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/scheduled`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          return;
+        }
+
+        renderScheduled(data.scheduled || []);
+      } catch (error) {
+        console.error("Scheduled load error:", error);
+      }
     }
 
     async function generatePosts() {
@@ -748,7 +893,9 @@
       try {
         const response = await fetch(`${API_BASE_URL}/generate`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({ topic, tone, type })
         });
 
@@ -807,7 +954,7 @@
 
           const scheduleButton = document.createElement("button");
           scheduleButton.className = "schedule-btn";
-          scheduleButton.textContent = "Save Schedule";
+          scheduleButton.textContent = "Open Schedule";
           scheduleButton.onclick = () => toggleSchedulePanel(index);
 
           actions.appendChild(copyButton);
@@ -817,7 +964,7 @@
           schedulePanel.className = "schedule-panel";
           schedulePanel.id = `schedule-panel-${index}`;
           schedulePanel.innerHTML = `
-            <div class="schedule-title">Save this post to the publishing queue</div>
+            <div class="schedule-title">Save this post to the schedule</div>
             <div class="schedule-grid">
               <div class="field">
                 <label>Channel</label>
@@ -877,32 +1024,48 @@
     }
 
     async function realSchedule(index) {
-      const postText = latestPosts[index];
+      const post = latestPosts[index];
       const platform = document.getElementById(`platform-${index}`).value;
       const repeat = document.getElementById(`repeat-${index}`).value;
       const date = document.getElementById(`date-${index}`).value;
       const time = document.getElementById(`time-${index}`).value;
       const msg = document.getElementById(`schedule-message-${index}`);
 
+      if (!post) {
+        msg.textContent = "No post found to schedule.";
+        return;
+      }
+
+      msg.textContent = "Saving schedule...";
+
       try {
-        const res = await fetch(`${API_BASE_URL}/schedule`, {
+        const response = await fetch(`${API_BASE_URL}/schedule`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ postText, platform, date, time, repeat })
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            postText: post,
+            platform,
+            date,
+            time,
+            repeat
+          })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (!res.ok) {
+        if (!response.ok) {
           msg.textContent = data.error || "Failed to save schedule.";
           return;
         }
 
-        msg.textContent = `Saved to ${platform}${date ? ` for ${date}` : ""}${time ? ` at ${time}` : ""}.`;
+        msg.textContent = `Schedule saved for ${platform}.`;
+        hideSchedulePanel(index);
         await loadScheduled();
       } catch (error) {
         console.error(error);
-        msg.textContent = "Error saving schedule.";
+        msg.textContent = "Could not connect to the server.";
       }
     }
 
@@ -920,63 +1083,6 @@
       } catch (error) {
         status.textContent = "Could not copy all posts.";
       }
-    }
-
-    async function loadHistory() {
-      const historyList = document.getElementById("historyList");
-
-      try {
-        const res = await fetch(`${API_BASE_URL}/posts`);
-        const data = await res.json();
-
-        if (!res.ok || !Array.isArray(data) || !data.length) {
-          historyList.innerHTML = '<div class="mini-item"><div class="mini-item-text">No post history yet.</div></div>';
-          return;
-        }
-
-        historyList.innerHTML = data.slice(0, 3).map(item => `
-          <div class="mini-item">
-            <div class="mini-item-title">${escapeHtml(item.topic || 'Untitled')}</div>
-            <div class="mini-item-text">${escapeHtml((item.posts && item.posts[0]) || 'No post available.')}</div>
-            <div class="mini-item-meta">${escapeHtml(item.tone || 'tone')} • ${escapeHtml(item.type || 'type')}</div>
-          </div>
-        `).join("");
-      } catch (error) {
-        historyList.innerHTML = '<div class="mini-item"><div class="mini-item-text">Could not load history.</div></div>';
-      }
-    }
-
-    async function loadScheduled() {
-      const scheduledList = document.getElementById("scheduledList");
-
-      try {
-        const res = await fetch(`${API_BASE_URL}/scheduled`);
-        const data = await res.json();
-
-        if (!res.ok || !Array.isArray(data) || !data.length) {
-          scheduledList.innerHTML = '<div class="mini-item"><div class="mini-item-text">No scheduled posts yet.</div></div>';
-          return;
-        }
-
-        scheduledList.innerHTML = data.slice(0, 3).map(item => `
-          <div class="mini-item">
-            <div class="mini-item-title">${escapeHtml(item.platform || 'Channel')}</div>
-            <div class="mini-item-text">${escapeHtml(item.postText || 'No post text.')}</div>
-            <div class="mini-item-meta">${escapeHtml(item.date || 'No date')} ${escapeHtml(item.time || '')} • ${escapeHtml(item.repeat || 'One time')}</div>
-          </div>
-        `).join("");
-      } catch (error) {
-        scheduledList.innerHTML = '<div class="mini-item"><div class="mini-item-text">Could not load scheduled posts.</div></div>';
-      }
-    }
-
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
     }
 
     updateUsageUI();
