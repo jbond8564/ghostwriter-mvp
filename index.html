@@ -39,16 +39,35 @@
       color: var(--text);
     }
 
-    .app-shell {
+.app-shell {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 300px 1fr;
   min-height: 100vh;
+}
+
+.sidebar {
+  padding: 20px;
+  border-right: 1px solid var(--border-soft);
+  overflow-y: auto;
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+
+.sidebar .panel {
+  margin-top: 20px;
+}
+
+.sidebar .usage-box,
+.sidebar .plan-box,
+.sidebar .banner {
+  margin-top: 16px;
 }
 
 .main {
   padding: 28px;
   width: 100%;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .content-grid {
