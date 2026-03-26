@@ -733,6 +733,7 @@
             <div class="empty-state">No generations yet.</div>
           </div>
         </div>
+<button class="ghost-btn" onclick="reportBug()">Report a Bug</button>
       </div>
     </div>
   </div>
@@ -1168,6 +1169,36 @@ async function submitEmail() {
     alert("Server error. Try again.");
   }
 }
+
+  function reportBug() {
+    const subject = encodeURIComponent("Inkova bug report");
+    const body = encodeURIComponent(
+`Hi Inkova team,
+
+I found a bug:
+
+What happened:
+[describe the issue]
+
+What I expected:
+[describe expected behavior]
+
+Page:
+${window.location.href}
+
+Device/Browser:
+${navigator.userAgent}
+
+Steps to reproduce:
+1.
+2.
+3.
+`
+    );
+
+    window.location.href = `mailto:JBond@InkovaTech.com?subject=${subject}&body=${body}`;
+  }
+</script>
 </script>
 </body>
 </html>
