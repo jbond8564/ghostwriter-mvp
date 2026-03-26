@@ -2,11 +2,16 @@ const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai");
 const crypto = require("crypto");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 const PORT = process.env.PORT || 3000;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "https://inkovatech.com";
 
 app.use(
   cors({
@@ -27,6 +32,63 @@ const client = new OpenAI({
 // In-memory MVP storage
 let postsDB = [];
 let scheduledDB = [];
+
+const DAILY_FREE_LIMIT = 3;
+
+function getTodayKey() {
+  const today = new Date();
+  return today.toISOString().split("T")[0]; // YYYY-MM-DD
+}
+
+async function getUsage(clientId) {
+  const today = getTodayKey();
+
+  const { data, error } = await supabase
+    .from("usage")
+    .select("*")
+    .eq("client_id", clientId)
+    .eq("date", today)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data?.count || 0;
+}
+
+async function incrementUsage(clientId) {
+  const today = getTodayKey();
+
+  const { data, error } = await supabase
+    .from("usage")
+    .select("*")
+    .eq("client_id", clientId)
+    .eq("date", today)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  if (!data) {
+    const { error: insertError } = await supabase
+      .from("usage")
+      .insert([
+        {
+          client_id: clientId,
+          date: today,
+          count: 1
+        }
+      ]);
+
+    if (insertError) throw insertError;
+    return;
+  }
+
+  const { error: updateError } = await supabase
+    .from("usage")
+    .update({ count: data.count + 1 })
+    .eq("id", data.id);
+
+  if (updateError) throw updateError;
+}
 
 const ALLOWED_TONES = new Set(["funny", "edgy", "professional"]);
 const ALLOWED_TYPES = new Set([
@@ -95,6 +157,20 @@ app.get("/health", (req, res) => {
 app.post("/generate", async (req, res) => {
   try {
     const topic = safeTrim(req.body?.topic);
+const clientId = safeTrim(req.body?.clientId);
+
+if (!clientId) {
+  return res.status(400).json({ error: "Missing clientId" });
+}
+
+const currentUsage = await getUsage(clientId);
+
+if (currentUsage >= DAILY_FREE_LIMIT) {
+  return res.status(429).json({
+    error: "Daily limit reached",
+    limit: DAILY_FREE_LIMIT
+  });
+}
     const tone = safeTrim(req.body?.tone, "professional").toLowerCase();
     const type = safeTrim(req.body?.type, "drink").toLowerCase();
 
@@ -200,7 +276,7 @@ Important:
     };
 
     postsDB.unshift(record);
-
+await incrementUsage(clientId);
     res.json({
       posts,
       recordId: record.id,
@@ -264,7 +340,7 @@ app.post("/schedule", (req, res) => {
       date: date || null,
       time: time || null,
       repeat,
-      status: "scheduled",
+      status: "draft",
       createdAt: new Date().toISOString()
     };
 
@@ -287,6 +363,43 @@ app.get("/scheduled", (req, res) => {
   res.json({
     scheduled: scheduledDB.slice(0, 20)
   });
+});
+
+app.post("/waitlist", async (req, res) => {
+  const email = safeTrim(req.body?.email).toLowerCase();
+
+  if (!email || !email.includes("@")) {
+    return res.status(400).json({ error: "Valid email required." });
+  }
+
+  try {
+    const { error } = await supabase
+      .from("waitlist")
+      .insert([{ email }]);
+
+    if (error) throw error;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Waitlist error:", err);
+    res.status(500).json({ error: "Failed to save email." });
+  }
+});
+
+app.get("/waitlist", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("waitlist")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ emails: data });
+  } catch (err) {
+    console.error("Fetch waitlist error:", err);
+    res.status(500).json({ error: "Failed to fetch waitlist." });
+  }
 });
 
 app.listen(PORT, () => {

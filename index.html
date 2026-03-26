@@ -761,12 +761,6 @@
   </div>
 </div>
 
-                      </div>
-        </section>
-      </div>
-    </main>
-  </div>
-
   <script>
   const API_BASE_URL = "https://ghostwriter-backend-xx4m.onrender.com";
   const DAILY_FREE_LIMIT = 3;
@@ -864,7 +858,7 @@
     const container = document.getElementById("scheduledList");
 
     if (!items || !items.length) {
-      container.innerHTML = `<div class="empty-state">No schedules saved yet.</div>`;
+      container.innerHTML = `<div class="empty-state">No drafts saved yet.</div>`;
       return;
     }
 
@@ -875,7 +869,7 @@
           <div class="list-item">
             <div class="list-item-top">
               <div class="list-item-title">${item.platform || "Platform"} • ${item.repeat || "One time"}</div>
-              <span class="status-pill">${item.status || "Scheduled"}</span>
+              <span class="status-pill">${item.status || "Saved to drafts"}</span>
             </div>
             <p class="list-item-text">${truncateText(item.postText)}</p>
             <div class="small" style="margin-top: 8px;">${formatDateTime(item.date, item.time)}</div>
@@ -911,27 +905,12 @@
     }
   }
 
-  async function submitEmail() {
-    const emailInput = document.getElementById("emailInput");
-    const email = emailInput.value.trim();
+  let clientId = localStorage.getItem("inkova_client_id");
 
-    if (!email || !email.includes("@")) {
-      alert("Please enter a valid email.");
-      return;
-    }
-
-    const saved = JSON.parse(localStorage.getItem("inkova_interest_emails") || "[]");
-    saved.push({
-      email,
-      createdAt: new Date().toISOString()
-    });
-
-    localStorage.setItem("inkova_interest_emails", JSON.stringify(saved));
-
-    emailInput.value = "";
-    alert("You’re on the early access list.");
-    hidePaywall();
-  }
+if (!clientId) {
+  clientId = crypto.randomUUID();
+  localStorage.setItem("inkova_client_id", clientId);
+}
 
   async function generatePosts() {
     const topic = document.getElementById("topic").value.trim();
@@ -962,20 +941,22 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ topic, tone, type })
+        body: JSON.stringify({ topic, tone, type, clientId })
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        status.textContent = data.error || "Server error.";
-        return;
-      }
+if (response.status === 429) {
+  status.textContent = "You’ve reached today’s free limit.";
+  showPaywall();
+  updateUsageUI();
+  return;
+}
 
-      if (!data.posts || data.posts.length === 0) {
-        status.textContent = "No posts returned.";
-        return;
-      }
+if (!response.ok) {
+  status.textContent = data.error || "Server error.";
+  return;
+}
 
       setUsageCount(getUsageCount() + 1);
       latestPosts = data.posts;
@@ -1020,7 +1001,7 @@
 
         const scheduleButton = document.createElement("button");
         scheduleButton.className = "schedule-btn";
-        scheduleButton.textContent = "Open Schedule";
+        scheduleButton.textContent = "Open Draft Schedule";
         scheduleButton.onclick = () => toggleSchedulePanel(index);
 
         actions.appendChild(copyButton);
@@ -1030,7 +1011,7 @@
         schedulePanel.className = "schedule-panel";
         schedulePanel.id = `schedule-panel-${index}`;
         schedulePanel.innerHTML = `
-          <div class="schedule-title">Save this post to the schedule</div>
+          <div class="schedule-title">Save this post as a draft</div>
           <div class="schedule-grid">
             <div class="field">
               <label>Channel</label>
@@ -1059,7 +1040,7 @@
             </div>
           </div>
           <div class="button-row">
-            <button class="primary-btn" onclick="realSchedule(${index})">Save Schedule</button>
+            <button class="primary-btn" onclick="realSchedule(${index})">Save Draft</button>
             <button class="ghost-btn" onclick="hideSchedulePanel(${index})">Cancel</button>
           </div>
           <div class="small" id="schedule-message-${index}" style="margin-top:10px;"></div>
@@ -1098,11 +1079,11 @@
     const msg = document.getElementById(`schedule-message-${index}`);
 
     if (!post) {
-      msg.textContent = "No post found to schedule.";
+      msg.textContent = "No post found to draft.";
       return;
     }
 
-    msg.textContent = "Saving schedule...";
+    msg.textContent = "Saving draft...";
 
     try {
       const response = await fetch(`${API_BASE_URL}/schedule`, {
@@ -1122,11 +1103,11 @@
       const data = await response.json();
 
       if (!response.ok) {
-        msg.textContent = data.error || "Failed to save schedule.";
+        msg.textContent = data.error || "Failed to save draft.";
         return;
       }
 
-      msg.textContent = `Schedule saved for ${platform}.`;
+      msg.textContent = `Draft saved for ${platform}.`;
       hideSchedulePanel(index);
       await loadScheduled();
     } catch (error) {
@@ -1154,6 +1135,39 @@
   updateUsageUI();
   loadHistory();
   loadScheduled();
+async function submitEmail() {
+  const emailInput = document.getElementById("emailInput");
+  const email = emailInput.value.trim();
+
+  if (!email || !email.includes("@")) {
+    alert("Please enter a valid email.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/waitlist`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.error || "Could not join the waitlist.");
+      return;
+    }
+
+    emailInput.value = "";
+    alert("You're on the list.");
+    hidePaywall();
+  } catch (error) {
+    console.error("Waitlist error:", error);
+    alert("Server error. Try again.");
+  }
+}
 </script>
 </body>
 </html>
