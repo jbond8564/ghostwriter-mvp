@@ -488,19 +488,42 @@
       line-height: 1.5;
     }
 
-    .paywall {
-      display: none;
-      margin-top: 18px;
-      background: linear-gradient(180deg, rgba(14, 21, 36, 0.98), rgba(10, 18, 31, 0.98));
-      border: 1px solid #31425f;
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
+    .paywall-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
 
-    .hidden {
-      display: none !important;
-    }
+.hidden {
+  display: none;
+}
+
+.paywall-card {
+  background: #0b1323;
+  padding: 32px;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid #1f2a44;
+}
+
+.paywall-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 16px 0;
+  border-radius: 8px;
+  border: none;
+}
+
+.subtle {
+  font-size: 12px;
+  opacity: 0.7;
+}
 
     @media (max-width: 980px) {
       .app-shell {
@@ -602,23 +625,26 @@
             </div>
           </div>
 
-          <div id="paywall" class="paywall">
-            <h3>Upgrade to Inkova Pro</h3>
-            <p class="muted">You’ve used today’s free generations. Upgrade to unlock unlimited content generation, publishing workflows, and connected channel tools.</p>
+          <div id="paywallModal" class="paywall-modal hidden">
+  <div class="paywall-card">
+    <h2>You're out of free posts</h2>
 
-            <div class="plan-box">
-              <div class="small">Inkova Pro</div>
-              <div class="price">$9<span class="small">/month</span></div>
-              <div class="small">Unlimited generations • publishing workflows • connected social channels • built for hospitality, nightlife, and events</div>
-            </div>
+    <p>
+      You're using Inkova the way it's meant to be used.<br><br>
+      We're opening up unlimited content + scheduling soon.
+    </p>
 
-            <div class="button-row">
-              <button class="primary-btn" onclick="handleUpgradeClick()">Upgrade to Pro</button>
-              <button class="ghost-btn" onclick="resetFreeLimit()">Reset Demo Limit</button>
-            </div>
+    <input id="emailInput" type="email" placeholder="Enter your email" />
 
-            <div id="upgradeMessage" class="status"></div>
-          </div>
+    <button onclick="submitEmail()" class="primary-btn">
+      Get early access
+    </button>
+
+    <p class="subtle">Or come back tomorrow for 3 more free posts.</p>
+  </div>
+</div>
+
+                      </div>
         </section>
 
         <section>
@@ -676,381 +702,392 @@
   </div>
 
   <script>
-    const API_BASE_URL = "https://ghostwriter-backend-xx4m.onrender.com";
-    const DAILY_FREE_LIMIT = 3;
+  const API_BASE_URL = "https://ghostwriter-backend-xx4m.onrender.com";
+  const DAILY_FREE_LIMIT = 3;
 
-    let latestPosts = [];
+  let latestPosts = [];
 
-    function getTodayKey() {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, "0");
-      const dd = String(today.getDate()).padStart(2, "0");
-      return `inkova_usage_${yyyy}-${mm}-${dd}`;
+  function getTodayKey() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    return `inkova_usage_${yyyy}-${mm}-${dd}`;
+  }
+
+  function getUsageCount() {
+    return parseInt(localStorage.getItem(getTodayKey()) || "0", 10);
+  }
+
+  function setUsageCount(count) {
+    localStorage.setItem(getTodayKey(), String(count));
+  }
+
+  function getRemainingUses() {
+    return Math.max(0, DAILY_FREE_LIMIT - getUsageCount());
+  }
+
+  function showPaywall() {
+    const modal = document.getElementById("paywallModal");
+    if (modal) modal.classList.remove("hidden");
+  }
+
+  function hidePaywall() {
+    const modal = document.getElementById("paywallModal");
+    if (modal) modal.classList.add("hidden");
+  }
+
+  function updateUsageUI() {
+    const remaining = getRemainingUses();
+    const usageNumber = document.getElementById("usageNumber");
+    const usageText = document.getElementById("usageText");
+    const generatorPanel = document.getElementById("generatorPanel");
+
+    usageNumber.textContent = remaining;
+    usageText.textContent = `${remaining} posts remaining today`;
+
+    if (remaining <= 0) {
+      generatorPanel.classList.add("disabled");
+    } else {
+      generatorPanel.classList.remove("disabled");
+      hidePaywall();
+    }
+  }
+
+  function truncateText(text, max = 110) {
+    if (!text) return "";
+    return text.length > max ? `${text.slice(0, max)}...` : text;
+  }
+
+  function formatDateTime(date, time) {
+    if (!date && !time) return "Not specified";
+    if (date && time) return `${date} at ${time}`;
+    return date || time;
+  }
+
+  function renderHistory(records) {
+    const container = document.getElementById("historyList");
+
+    if (!records || !records.length) {
+      container.innerHTML = `<div class="empty-state">No generations yet.</div>`;
+      return;
     }
 
-    function getUsageCount() {
-      const key = getTodayKey();
-      return parseInt(localStorage.getItem(key) || "0", 10);
-    }
+    container.innerHTML = records
+      .slice(0, 5)
+      .map((record) => {
+        const preview =
+          Array.isArray(record.posts) && record.posts.length
+            ? record.posts[0]
+            : "No preview available";
 
-    function setUsageCount(count) {
-      localStorage.setItem(getTodayKey(), String(count));
-    }
-
-    function getRemainingUses() {
-      return Math.max(0, DAILY_FREE_LIMIT - getUsageCount());
-    }
-
-    function updateUsageUI() {
-      const remaining = getRemainingUses();
-      const usageNumber = document.getElementById("usageNumber");
-      const usageText = document.getElementById("usageText");
-      const generatorPanel = document.getElementById("generatorPanel");
-      const paywall = document.getElementById("paywall");
-
-      usageNumber.textContent = remaining;
-      usageText.textContent = `${remaining} generations left today`;
-
-      if (remaining <= 0) {
-        generatorPanel.classList.add("hidden");
-        paywall.style.display = "block";
-      } else {
-        generatorPanel.classList.remove("hidden");
-        paywall.style.display = "none";
-      }
-    }
-
-    function fakeConnect(platform) {
-      const msg = document.getElementById("connectMessage");
-      msg.textContent = `${platform} was selected. Live account linking is not enabled yet, but this helps validate which channels matter most to customers.`;
-      console.log(`CHANNEL_SELECTED_${platform.toUpperCase()}`);
-    }
-
-    function handleUpgradeClick() {
-      const msg = document.getElementById("upgradeMessage");
-      msg.textContent = "Upgrade flow coming soon. This click is being used to validate purchase intent.";
-      console.log("UPGRADE_CLICKED");
-    }
-
-    function resetFreeLimit() {
-      setUsageCount(0);
-      document.getElementById("upgradeMessage").textContent = "";
-      updateUsageUI();
-    }
-
-    function truncateText(text, max = 110) {
-      if (!text) return "";
-      return text.length > max ? `${text.slice(0, max)}...` : text;
-    }
-
-    function formatDateTime(date, time) {
-      if (!date && !time) return "Not specified";
-      if (date && time) return `${date} at ${time}`;
-      return date || time;
-    }
-
-    function renderHistory(records) {
-      const container = document.getElementById("historyList");
-
-      if (!records || !records.length) {
-        container.innerHTML = `<div class="empty-state">No generations yet.</div>`;
-        return;
-      }
-
-      container.innerHTML = records
-        .slice(0, 5)
-        .map((record) => {
-          const preview = Array.isArray(record.posts) && record.posts.length ? record.posts[0] : "No preview available";
-          return `
-            <div class="list-item">
-              <div class="list-item-top">
-                <div class="list-item-title">${record.type || "content"} • ${record.tone || "tone"}</div>
-                <span class="status-pill">Generated</span>
-              </div>
-              <p class="list-item-text">${truncateText(preview)}</p>
+        return `
+          <div class="list-item">
+            <div class="list-item-top">
+              <div class="list-item-title">${record.type || "content"} • ${record.tone || "tone"}</div>
+              <span class="status-pill">Generated</span>
             </div>
-          `;
-        })
-        .join("");
+            <p class="list-item-text">${truncateText(preview)}</p>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  function renderScheduled(items) {
+    const container = document.getElementById("scheduledList");
+
+    if (!items || !items.length) {
+      container.innerHTML = `<div class="empty-state">No schedules saved yet.</div>`;
+      return;
     }
 
-    function renderScheduled(items) {
-      const container = document.getElementById("scheduledList");
-
-      if (!items || !items.length) {
-        container.innerHTML = `<div class="empty-state">No schedules saved yet.</div>`;
-        return;
-      }
-
-      container.innerHTML = items
-        .slice(0, 5)
-        .map((item) => {
-          return `
-            <div class="list-item">
-              <div class="list-item-top">
-                <div class="list-item-title">${item.platform || "Platform"} • ${item.repeat || "One time"}</div>
-                <span class="status-pill">${item.status || "Scheduled"}</span>
-              </div>
-              <p class="list-item-text">${truncateText(item.postText)}</p>
-              <div class="small" style="margin-top: 8px;">${formatDateTime(item.date, item.time)}</div>
+    container.innerHTML = items
+      .slice(0, 5)
+      .map((item) => {
+        return `
+          <div class="list-item">
+            <div class="list-item-top">
+              <div class="list-item-title">${item.platform || "Platform"} • ${item.repeat || "One time"}</div>
+              <span class="status-pill">${item.status || "Scheduled"}</span>
             </div>
-          `;
-        })
-        .join("");
+            <p class="list-item-text">${truncateText(item.postText)}</p>
+            <div class="small" style="margin-top: 8px;">${formatDateTime(item.date, item.time)}</div>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  async function loadHistory() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts`);
+      const data = await response.json();
+
+      if (!response.ok) return;
+
+      renderHistory(data.posts || []);
+    } catch (error) {
+      console.error("History load error:", error);
+    }
+  }
+
+  async function loadScheduled() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/scheduled`);
+      const data = await response.json();
+
+      if (!response.ok) return;
+
+      renderScheduled(data.scheduled || []);
+    } catch (error) {
+      console.error("Scheduled load error:", error);
+    }
+  }
+
+  async function submitEmail() {
+    const emailInput = document.getElementById("emailInput");
+    const email = emailInput.value.trim();
+
+    if (!email || !email.includes("@")) {
+      alert("Please enter a valid email.");
+      return;
     }
 
-    async function loadHistory() {
-      try {
-        const response = await fetch(`${API_BASE_URL}/posts`);
-        const data = await response.json();
+    const saved = JSON.parse(localStorage.getItem("inkova_interest_emails") || "[]");
+    saved.push({
+      email,
+      createdAt: new Date().toISOString()
+    });
 
-        if (!response.ok) {
-          return;
-        }
+    localStorage.setItem("inkova_interest_emails", JSON.stringify(saved));
 
-        renderHistory(data.posts || []);
-      } catch (error) {
-        console.error("History load error:", error);
-      }
-    }
+    emailInput.value = "";
+    alert("You’re on the early access list.");
+    hidePaywall();
+  }
 
-    async function loadScheduled() {
-      try {
-        const response = await fetch(`${API_BASE_URL}/scheduled`);
-        const data = await response.json();
+  async function generatePosts() {
+    const topic = document.getElementById("topic").value.trim();
+    const tone = document.getElementById("tone").value;
+    const type = document.getElementById("type").value;
+    const status = document.getElementById("status");
+    const results = document.getElementById("results");
 
-        if (!response.ok) {
-          return;
-        }
-
-        renderScheduled(data.scheduled || []);
-      } catch (error) {
-        console.error("Scheduled load error:", error);
-      }
-    }
-
-    async function generatePosts() {
-      const topic = document.getElementById("topic").value.trim();
-      const tone = document.getElementById("tone").value;
-      const type = document.getElementById("type").value;
-      const status = document.getElementById("status");
-      const results = document.getElementById("results");
-
-      if (!topic) {
-        status.textContent = "Enter a topic first.";
-        results.innerHTML = "";
-        return;
-      }
-
-      if (getRemainingUses() <= 0) {
-        updateUsageUI();
-        status.textContent = "Free limit reached.";
-        return;
-      }
-
-      status.textContent = "Generating content...";
+    if (!topic) {
+      status.textContent = "Enter a topic first.";
       results.innerHTML = "";
-      latestPosts = [];
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/generate`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ topic, tone, type })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          status.textContent = data.error || "Server error.";
-          return;
-        }
-
-        if (!data.posts || data.posts.length === 0) {
-          status.textContent = "No posts returned.";
-          return;
-        }
-
-        setUsageCount(getUsageCount() + 1);
-        latestPosts = data.posts;
-        status.textContent = "Posts generated.";
-
-        data.posts.forEach((post, index) => {
-          const card = document.createElement("div");
-          card.className = "post-card";
-
-          const top = document.createElement("div");
-          top.className = "post-card-top";
-
-          const postIndex = document.createElement("div");
-          postIndex.className = "post-index";
-          postIndex.textContent = `Post ${index + 1}`;
-
-          const postTag = document.createElement("span");
-          postTag.className = "status-pill";
-          postTag.textContent = "Ready to review";
-
-          top.appendChild(postIndex);
-          top.appendChild(postTag);
-
-          const text = document.createElement("p");
-          text.className = "post-text";
-          text.textContent = post;
-
-          const actions = document.createElement("div");
-          actions.className = "post-actions";
-
-          const copyButton = document.createElement("button");
-          copyButton.className = "copy-btn";
-          copyButton.textContent = "Copy";
-          copyButton.onclick = async () => {
-            try {
-              await navigator.clipboard.writeText(post);
-              status.textContent = "Post copied.";
-            } catch (error) {
-              status.textContent = "Could not copy.";
-            }
-          };
-
-          const scheduleButton = document.createElement("button");
-          scheduleButton.className = "schedule-btn";
-          scheduleButton.textContent = "Open Schedule";
-          scheduleButton.onclick = () => toggleSchedulePanel(index);
-
-          actions.appendChild(copyButton);
-          actions.appendChild(scheduleButton);
-
-          const schedulePanel = document.createElement("div");
-          schedulePanel.className = "schedule-panel";
-          schedulePanel.id = `schedule-panel-${index}`;
-          schedulePanel.innerHTML = `
-            <div class="schedule-title">Save this post to the schedule</div>
-            <div class="schedule-grid">
-              <div class="field">
-                <label>Channel</label>
-                <select id="platform-${index}">
-                  <option>Instagram</option>
-                  <option>Facebook</option>
-                  <option>TikTok</option>
-                  <option>X</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>Repeat</label>
-                <select id="repeat-${index}">
-                  <option>One time</option>
-                  <option>Daily</option>
-                  <option>Weekly</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>Date</label>
-                <input id="date-${index}" type="date" />
-              </div>
-              <div class="field">
-                <label>Time</label>
-                <input id="time-${index}" type="time" />
-              </div>
-            </div>
-            <div class="button-row">
-              <button class="primary-btn" onclick="realSchedule(${index})">Save Schedule</button>
-              <button class="ghost-btn" onclick="hideSchedulePanel(${index})">Cancel</button>
-            </div>
-            <div class="small" id="schedule-message-${index}" style="margin-top:10px;"></div>
-          `;
-
-          card.appendChild(top);
-          card.appendChild(text);
-          card.appendChild(actions);
-          card.appendChild(schedulePanel);
-          results.appendChild(card);
-        });
-
-        updateUsageUI();
-        await loadHistory();
-      } catch (error) {
-        console.error(error);
-        status.textContent = "Could not connect to the server.";
-      }
+      return;
     }
 
-    function toggleSchedulePanel(index) {
-      const panel = document.getElementById(`schedule-panel-${index}`);
-      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    if (getRemainingUses() <= 0) {
+      showPaywall();
+      status.textContent = "You’ve reached today’s free limit.";
+      return;
     }
 
-    function hideSchedulePanel(index) {
-      document.getElementById(`schedule-panel-${index}`).style.display = "none";
-    }
+    status.textContent = "Generating content...";
+    results.innerHTML = "";
+    latestPosts = [];
 
-    async function realSchedule(index) {
-      const post = latestPosts[index];
-      const platform = document.getElementById(`platform-${index}`).value;
-      const repeat = document.getElementById(`repeat-${index}`).value;
-      const date = document.getElementById(`date-${index}`).value;
-      const time = document.getElementById(`time-${index}`).value;
-      const msg = document.getElementById(`schedule-message-${index}`);
+    try {
+      const response = await fetch(`${API_BASE_URL}/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ topic, tone, type })
+      });
 
-      if (!post) {
-        msg.textContent = "No post found to schedule.";
+      const data = await response.json();
+
+      if (!response.ok) {
+        status.textContent = data.error || "Server error.";
         return;
       }
 
-      msg.textContent = "Saving schedule...";
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/schedule`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            postText: post,
-            platform,
-            date,
-            time,
-            repeat
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          msg.textContent = data.error || "Failed to save schedule.";
-          return;
-        }
-
-        msg.textContent = `Schedule saved for ${platform}.`;
-        hideSchedulePanel(index);
-        await loadScheduled();
-      } catch (error) {
-        console.error(error);
-        msg.textContent = "Could not connect to the server.";
-      }
-    }
-
-    async function copyAllPosts() {
-      const status = document.getElementById("status");
-
-      if (!latestPosts.length) {
-        status.textContent = "Generate posts first.";
+      if (!data.posts || data.posts.length === 0) {
+        status.textContent = "No posts returned.";
         return;
       }
 
-      try {
-        await navigator.clipboard.writeText(latestPosts.join("\n\n"));
-        status.textContent = "All posts copied.";
-      } catch (error) {
-        status.textContent = "Could not copy all posts.";
-      }
+      setUsageCount(getUsageCount() + 1);
+      latestPosts = data.posts;
+      status.textContent = "Posts generated.";
+
+      data.posts.forEach((post, index) => {
+        const card = document.createElement("div");
+        card.className = "post-card";
+
+        const top = document.createElement("div");
+        top.className = "post-card-top";
+
+        const postIndex = document.createElement("div");
+        postIndex.className = "post-index";
+        postIndex.textContent = `Post ${index + 1}`;
+
+        const postTag = document.createElement("span");
+        postTag.className = "status-pill";
+        postTag.textContent = "Ready to review";
+
+        top.appendChild(postIndex);
+        top.appendChild(postTag);
+
+        const text = document.createElement("p");
+        text.className = "post-text";
+        text.textContent = post;
+
+        const actions = document.createElement("div");
+        actions.className = "post-actions";
+
+        const copyButton = document.createElement("button");
+        copyButton.className = "copy-btn";
+        copyButton.textContent = "Copy";
+        copyButton.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(post);
+            status.textContent = "Post copied.";
+          } catch (error) {
+            status.textContent = "Could not copy.";
+          }
+        };
+
+        const scheduleButton = document.createElement("button");
+        scheduleButton.className = "schedule-btn";
+        scheduleButton.textContent = "Open Schedule";
+        scheduleButton.onclick = () => toggleSchedulePanel(index);
+
+        actions.appendChild(copyButton);
+        actions.appendChild(scheduleButton);
+
+        const schedulePanel = document.createElement("div");
+        schedulePanel.className = "schedule-panel";
+        schedulePanel.id = `schedule-panel-${index}`;
+        schedulePanel.innerHTML = `
+          <div class="schedule-title">Save this post to the schedule</div>
+          <div class="schedule-grid">
+            <div class="field">
+              <label>Channel</label>
+              <select id="platform-${index}">
+                <option>Instagram</option>
+                <option>Facebook</option>
+                <option>TikTok</option>
+                <option>X</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Repeat</label>
+              <select id="repeat-${index}">
+                <option>One time</option>
+                <option>Daily</option>
+                <option>Weekly</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Date</label>
+              <input id="date-${index}" type="date" />
+            </div>
+            <div class="field">
+              <label>Time</label>
+              <input id="time-${index}" type="time" />
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="primary-btn" onclick="realSchedule(${index})">Save Schedule</button>
+            <button class="ghost-btn" onclick="hideSchedulePanel(${index})">Cancel</button>
+          </div>
+          <div class="small" id="schedule-message-${index}" style="margin-top:10px;"></div>
+        `;
+
+        card.appendChild(top);
+        card.appendChild(text);
+        card.appendChild(actions);
+        card.appendChild(schedulePanel);
+        results.appendChild(card);
+      });
+
+      updateUsageUI();
+      await loadHistory();
+    } catch (error) {
+      console.error(error);
+      status.textContent = "Could not connect to the server.";
+    }
+  }
+
+  function toggleSchedulePanel(index) {
+    const panel = document.getElementById(`schedule-panel-${index}`);
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+  }
+
+  function hideSchedulePanel(index) {
+    document.getElementById(`schedule-panel-${index}`).style.display = "none";
+  }
+
+  async function realSchedule(index) {
+    const post = latestPosts[index];
+    const platform = document.getElementById(`platform-${index}`).value;
+    const repeat = document.getElementById(`repeat-${index}`).value;
+    const date = document.getElementById(`date-${index}`).value;
+    const time = document.getElementById(`time-${index}`).value;
+    const msg = document.getElementById(`schedule-message-${index}`);
+
+    if (!post) {
+      msg.textContent = "No post found to schedule.";
+      return;
     }
 
-    updateUsageUI();
-    loadHistory();
-    loadScheduled();
-  </script>
+    msg.textContent = "Saving schedule...";
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/schedule`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          postText: post,
+          platform,
+          date,
+          time,
+          repeat
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        msg.textContent = data.error || "Failed to save schedule.";
+        return;
+      }
+
+      msg.textContent = `Schedule saved for ${platform}.`;
+      hideSchedulePanel(index);
+      await loadScheduled();
+    } catch (error) {
+      console.error(error);
+      msg.textContent = "Could not connect to the server.";
+    }
+  }
+
+  async function copyAllPosts() {
+    const status = document.getElementById("status");
+
+    if (!latestPosts.length) {
+      status.textContent = "Generate posts first.";
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(latestPosts.join("\n\n"));
+      status.textContent = "All posts copied.";
+    } catch (error) {
+      status.textContent = "Could not copy all posts.";
+    }
+  }
+
+  updateUsageUI();
+  loadHistory();
+  loadScheduled();
+</script>
 </body>
 </html>
