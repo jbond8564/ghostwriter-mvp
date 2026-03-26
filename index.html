@@ -40,10 +40,23 @@
     }
 
     .app-shell {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      min-height: 100vh;
-    }
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.main {
+  padding: 28px;
+  width: 100%;
+  min-width: 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
 
     .sidebar {
       background: rgba(10, 17, 30, 0.94);
@@ -503,23 +516,36 @@
 }
 
 .paywall-card {
-  background: #0b1323;
-  padding: 32px;
-  border-radius: 16px;
-  max-width: 400px;
+  background: linear-gradient(180deg, rgba(12, 21, 40, 0.98), rgba(8, 15, 30, 0.98));
+  padding: 34px 30px;
+  border-radius: 20px;
+  max-width: 420px;
   width: 100%;
   text-align: center;
-  border: 1px solid #1f2a44;
+  border: 1px solid rgba(120, 145, 190, 0.18);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
 }
-
 .paywall-card input {
   width: 100%;
-  padding: 12px;
-  margin: 16px 0;
-  border-radius: 8px;
-  border: none;
+  padding: 14px 16px;
+  margin: 18px 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(120, 145, 190, 0.28);
+  background: rgba(10, 18, 34, 0.9);
+  color: #ffffff;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
 }
 
+.paywall-card input::placeholder {
+  color: rgba(184, 196, 220, 0.72);
+}
+
+.paywall-card input:focus {
+  border-color: #4f6ea8;
+  box-shadow: 0 0 0 3px rgba(79, 110, 168, 0.18);
+}
 .subtle {
   font-size: 12px;
   opacity: 0.7;
@@ -634,7 +660,11 @@
       We're opening up unlimited content + scheduling soon.
     </p>
 
-    <input id="emailInput" type="email" placeholder="Enter your email" />
+   <input
+  id="emailInput"
+  type="email"
+  placeholder="Enter your email to join the waitlist"
+/>
 
     <button onclick="submitEmail()" class="primary-btn">
       Get early access
