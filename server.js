@@ -11,14 +11,27 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 const PORT = process.env.PORT || 3000;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "https://inkovatech.com";
+const ALLOWED_ORIGINS = [
+  "https://inkovatech.com",
+  "https://www.inkovatech.com",
+  "https://ghostwriter-mvp.netlify.app"
+];
 
 app.use(
   cors({
-    origin: ALLOWED_ORIGIN === "*" ? true : ALLOWED_ORIGIN
+    origin: function (origin, callback) {
+      // allow server-to-server or curl requests (no origin)
+      if (!origin) return callback(null, true);
+
+      if (ALLOWED_ORIGINS.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    }
   })
-);
-app.use(express.json());
+
+);app.use(express.json());
 
 if (!process.env.OPENAI_API_KEY) {
   console.error("Missing OPENAI_API_KEY");
