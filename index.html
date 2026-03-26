@@ -617,12 +617,52 @@
         <div class="badge">Early Access</div>
       </div>
 
-      <div class="content-grid">
-
-  <!-- LEFT COLUMN -->
+     <div class="content-grid">
   <div class="left-column">
     <div id="generatorPanel" class="panel">
-      <!-- your existing generator code stays here -->
+      <h3>Create content</h3>
+      <p class="panel-subtitle">
+        Turn any idea into social content you can review, copy, and save into a publishing workflow in seconds.
+      </p>
+
+      <div class="grid">
+        <div class="field full">
+          <label for="topic">What do you want to post about?</label>
+          <input
+            id="topic"
+            type="text"
+            placeholder="e.g. new menu launch, weekend promo, event announcement"
+          />
+        </div>
+
+        <div class="field">
+          <label for="tone">Tone</label>
+          <select id="tone">
+            <option value="funny">Funny</option>
+            <option value="edgy">Edgy</option>
+            <option value="professional">Professional</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="type">Content type</label>
+          <select id="type">
+            <option value="drink">Drink Promo</option>
+            <option value="food">Food Special</option>
+            <option value="event">Event Promotion</option>
+            <option value="happy-hour">Happy Hour</option>
+            <option value="weekend-special">Weekend Special</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button class="primary-btn" onclick="generatePosts()">Generate Post</button>
+        <button class="regen-btn" onclick="generatePosts()">Regenerate</button>
+        <button class="ghost-btn" onclick="copyAllPosts()">Copy All</button>
+      </div>
+
+      <div id="status" class="status"></div>
     </div>
 
     <div class="results-panel">
@@ -630,7 +670,6 @@
     </div>
   </div>
 
-  <!-- RIGHT COLUMN -->
   <div class="right-column">
     <div class="panel">
       <h3>Workspace</h3>
@@ -638,38 +677,58 @@
         A clearer, more premium view of usage, plan status, and recent activity.
       </p>
 
-      <div class="stat-card">
+      <div class="usage-box">
         <div class="small">Free usage remaining today</div>
         <div id="usageNumber" class="usage-number">3</div>
-        <div id="usageText" class="small">3 posts remaining today</div>
+        <div id="usageText" class="muted">3 posts remaining today</div>
       </div>
 
-      <div class="stat-card">
+      <div class="plan-box">
         <div class="small">Current plan</div>
-        <div class="plan-name">Free</div>
-        <div class="small">
-          Generate content, save schedules, and validate what local businesses want.
+        <div style="font-size: 22px; font-weight: 800; margin-top: 8px;">Free</div>
+        <div class="muted" style="margin-top: 8px;">
+          Generate content, save schedules, and validate what local businesses want before live posting is enabled.
+        </div>
+      </div>
+
+      <div class="preview-box">
+        <h3 style="font-size: 17px; margin-bottom: 8px;">Publishing flow</h3>
+        <p class="muted">
+          Posts can be generated, reviewed, copied, and saved into a simple schedule workflow. Live posting is the next step after customer validation.
+        </p>
+      </div>
+
+      <div class="list-box">
+        <div class="small">What this MVP already proves</div>
+        <ul>
+          <li>Users can generate social-ready content from a simple prompt.</li>
+          <li>Scheduling intent can be measured with real saved draft schedules.</li>
+          <li>Upgrade interest can be tracked with a lightweight paywall.</li>
+        </ul>
+      </div>
+
+      <div class="banner" id="connectMessage">
+        Connected channels are coming soon.
+      </div>
+
+      <div class="list-box">
+        <div class="small">Recent schedules</div>
+        <div id="scheduledList" class="sidebar-list">
+          <div class="empty-state">No schedules saved yet.</div>
+        </div>
+      </div>
+
+      <div class="list-box">
+        <div class="small">Recent generations</div>
+        <div id="historyList" class="sidebar-list">
+          <div class="empty-state">No generations yet.</div>
         </div>
       </div>
     </div>
   </div>
-
 </div>
 
-            <div class="button-row">
-              <button class="primary-btn" onclick="generatePosts()">Generate Post</button>
-              <button class="regen-btn" onclick="generatePosts()">Regenerate</button>
-              <button class="ghost-btn" onclick="copyAllPosts()">Copy All</button>
-            </div>
-
-            <div id="status" class="status"></div>
-
-            <div class="results-panel">
-              <div id="results" class="results-list"></div>
-            </div>
-          </div>
-
-          <div id="paywallModal" class="paywall-modal hidden">
+<div id="paywallModal" class="paywall-modal hidden">
   <div class="paywall-card">
     <h2>You're out of free posts</h2>
 
@@ -678,14 +737,14 @@
       We're opening up unlimited content + scheduling soon.
     </p>
 
-   <input
-  id="emailInput"
-  type="email"
-  placeholder="Enter your email to join the waitlist"
-/>
+    <input
+      id="emailInput"
+      type="email"
+      placeholder="Enter your email to join the waitlist"
+    />
 
     <button onclick="submitEmail()" class="primary-btn">
-      jain waitlist
+      Join waitlist
     </button>
 
     <p class="subtle">Or come back tomorrow for 3 more free posts.</p>
