@@ -69,6 +69,34 @@ async function getUsage(clientId) {
   return data?.count || 0;
 }
 
+async function savePostRecord(record) {
+  const { data, error } = await supabase
+    .from("posts")
+    .insert([
+      {
+        id: record.id,
+        client_id: record.clientId,
+        topic: record.topic,
+        tone: record.tone,
+        type: record.type,
+        platform: record.platform,
+        status: record.status,
+        scheduled_for: record.scheduledFor,
+        posts: record.posts,
+        created_at: record.createdAt
+      }
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Save post error:", error);
+    throw error;
+  }
+
+  return data;
+}
+
 async function incrementUsage(clientId) {
   const today = getTodayKey();
 
@@ -213,6 +241,7 @@ if (currentUsage >= DAILY_FREE_LIMIT) {
 }
     const tone = safeTrim(req.body?.tone, "professional").toLowerCase();
     const type = safeTrim(req.body?.type, "drink").toLowerCase();
+    const platform = safeTrim(req.body?.platform, "generic").toLowerCase();
 
     if (!topic || topic.length < 2) {
       return res.status(400).json({
@@ -312,6 +341,9 @@ Important:
   topic,
   tone,
   type,
+  platform,
+  status: "generated",
+  scheduledFor: null,
   posts,
   createdAt: new Date().toISOString()
 };
@@ -343,10 +375,31 @@ res.json({
   }
 });
 
-app.get("/posts", (req, res) => {
-  res.json({
-    posts: postsDB.slice(0, 20)
-  });
+app.get("/posts", async (req, res) => {
+  try {
+    const clientId = safeTrim(req.query.clientId);
+
+    let query = supabase
+      .from("posts")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (clientId) {
+      query = query.eq("client_id", clientId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    res.json({
+      posts: data || []
+    });
+  } catch (err) {
+    console.error("Fetch posts error:", err);
+    res.status(500).json({ error: "Failed to fetch posts." });
+  }
 });
 
 app.post("/schedule", (req, res) => {
