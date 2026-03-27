@@ -133,28 +133,6 @@ async function incrementUsage(clientId) {
   if (updateError) throw updateError;
 }
 
-async function savePostRecord(record) {
-  const { data, error } = await supabase
-    .from("posts")
-    .insert([
-      {
-        id: record.id,
-        client_id: record.clientId,
-        topic: record.topic,
-        tone: record.tone,
-        type: record.type,
-        posts: record.posts,
-        created_at: record.createdAt
-      }
-    ])
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return data;
-}
-
 const ALLOWED_TONES = new Set(["funny", "edgy", "professional"]);
 const ALLOWED_TYPES = new Set([
   "drink",
@@ -254,6 +232,7 @@ app.post("/generate", async (req, res) => {
   try {
     const topic = safeTrim(req.body?.topic);
 const clientId = safeTrim(req.body?.clientId);
+const platform = safeTrim(req.body?.platform, "generic").toLowerCase();
 
 if (!clientId) {
   return res.status(400).json({ error: "Missing clientId" });
@@ -269,7 +248,6 @@ if (currentUsage >= DAILY_FREE_LIMIT) {
 }
     const tone = safeTrim(req.body?.tone, "professional").toLowerCase();
     const type = safeTrim(req.body?.type, "drink").toLowerCase();
-    const platform = safeTrim(req.body?.platform, "generic").toLowerCase();
 
     if (!topic || topic.length < 2) {
       return res.status(400).json({
