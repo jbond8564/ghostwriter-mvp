@@ -56,12 +56,14 @@ function getTodayKey() {
 
 async function getUsage(clientId) {
   const today = getTodayKey();
+  const environment = process.env.APP_ENV || "prod";
 
   const { data, error } = await supabase
     .from("usage")
     .select("*")
     .eq("client_id", clientId)
     .eq("date", today)
+    .eq("environment", environment)
     .maybeSingle();
 
   if (error) throw error;
@@ -100,12 +102,14 @@ async function savePostRecord(record) {
 
 async function incrementUsage(clientId) {
   const today = getTodayKey();
+  const environment = process.env.APP_ENV || "prod";
 
   const { data, error } = await supabase
     .from("usage")
     .select("*")
     .eq("client_id", clientId)
     .eq("date", today)
+    .eq("environment", environment)
     .maybeSingle();
 
   if (error) throw error;
@@ -117,7 +121,22 @@ async function incrementUsage(clientId) {
         {
           client_id: clientId,
           date: today,
-          count: 1
+          count: 1,
+          environment
+        }
+      ]);
+
+    if (insertError) throw insertError;
+    return;
+  }
+
+  const { error: updateError } = await supabase
+    .from("usage")
+    .update({ count: data.count + 1 })
+    .eq("id", data.id);
+
+  if (updateError) throw updateError;
+}
         }
       ]);
 
