@@ -902,7 +902,7 @@
 
   async function loadHistory() {
     try {
-      const response = await fetch(`${API_BASE_URL}/posts`);
+      const response = await fetch(`${API_BASE_URL}/posts?clientId=${encodeURIComponent(clientId)}`);
       const data = await response.json();
 
       if (!response.ok) return;

@@ -14,7 +14,8 @@ const PORT = process.env.PORT || 3000;
 const ALLOWED_ORIGINS = [
   "https://inkovatech.com",
   "https://www.inkovatech.com",
-  "https://ghostwriter-mvp.netlify.app"
+  "https://ghostwriter-mvp.netlify.app",
+  "https://dev--ghostwriter-mvp.netlify.app",
 ];
 
 app.use(
@@ -102,6 +103,28 @@ async function incrementUsage(clientId) {
     .eq("id", data.id);
 
   if (updateError) throw updateError;
+}
+
+async function savePostRecord(record) {
+  const { data, error } = await supabase
+    .from("posts")
+    .insert([
+      {
+        id: record.id,
+        client_id: record.clientId,
+        topic: record.topic,
+        tone: record.tone,
+        type: record.type,
+        posts: record.posts,
+        created_at: record.createdAt
+      }
+    ])
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  return data;
 }
 
 const ALLOWED_TONES = new Set(["funny", "edgy", "professional"]);
@@ -320,18 +343,30 @@ Important:
       createdAt: new Date().toISOString()
     };
 
-    postsDB.unshift(record);
+    const record = {
+  id: crypto.randomUUID(),
+  clientId,
+  topic,
+  tone,
+  type,
+  posts,
+  createdAt: new Date().toISOString()
+};
+
+await savePostRecord(record);
 await incrementUsage(clientId);
-    res.json({
-      posts,
-      recordId: record.id,
-      meta: {
-        topic,
-        tone,
-        type,
-        generatedAt: record.createdAt
-      }
-    });
+
+res.json({
+  posts,
+  recordId: record.id,
+  meta: {
+    topic,
+    tone,
+    type,
+    generatedAt: record.createdAt
+  }
+});
+
   } catch (error) {
     console.error("Generate error:", error);
 
@@ -346,10 +381,31 @@ await incrementUsage(clientId);
   }
 });
 
-app.get("/posts", (req, res) => {
-  res.json({
-    posts: postsDB.slice(0, 20)
-  });
+app.get("/posts", async (req, res) => {
+  try {
+    const clientId = safeTrim(req.query.clientId);
+
+    let query = supabase
+      .from("posts")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (clientId) {
+      query = query.eq("client_id", clientId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    res.json({
+      posts: data || []
+    });
+  } catch (err) {
+    console.error("Fetch posts error:", err);
+    res.status(500).json({ error: "Failed to fetch posts." });
+  }
 });
 
 app.post("/schedule", (req, res) => {
