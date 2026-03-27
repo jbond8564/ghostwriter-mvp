@@ -140,7 +140,6 @@ async function incrementUsage(clientId) {
 
     if (insertError) throw insertError;
     return;
-  }
 
   const { error: updateError } = await supabase
     .from("usage")
