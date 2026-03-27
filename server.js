@@ -307,26 +307,28 @@ Important:
     }
 
     const record = {
-      id: crypto.randomUUID(),
-      topic,
-      tone,
-      type,
-      posts,
-      createdAt: new Date().toISOString()
-    };
+  id: crypto.randomUUID(),
+  clientId,
+  topic,
+  tone,
+  type,
+  posts,
+  createdAt: new Date().toISOString()
+};
 
-    postsDB.unshift(record);
+await savePostRecord(record);
 await incrementUsage(clientId);
-    res.json({
-      posts,
-      recordId: record.id,
-      meta: {
-        topic,
-        tone,
-        type,
-        generatedAt: record.createdAt
-      }
-    });
+
+res.json({
+  posts,
+  recordId: record.id,
+  meta: {
+    topic,
+    tone,
+    type,
+    generatedAt: record.createdAt
+  }
+});
   } catch (error) {
     console.error("Generate error:", error);
 
