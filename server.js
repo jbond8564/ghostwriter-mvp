@@ -45,7 +45,6 @@ const client = new OpenAI({
 });
 
 // In-memory MVP storage
-let postsDB = [];
 let scheduledDB = [];
 
 const DAILY_FREE_LIMIT = 3;
@@ -85,7 +84,7 @@ async function savePostRecord(record) {
         scheduled_for: record.scheduledFor,
         posts: record.posts,
         created_at: record.createdAt,
-        enviroment: record.enviroment
+        environment: record.environment
       }
     ])
     .select()
@@ -228,7 +227,7 @@ app.post("/generate", async (req, res) => {
   try {
     const topic = safeTrim(req.body?.topic);
     const clientId = safeTrim(req.body?.clientId);
-    const enviroment = process.env.APP_ENV || "prod";
+    const environment = process.env.APP_ENV || "prod";
 
 if (!clientId) {
   return res.status(400).json({ error: "Missing clientId" });
@@ -349,7 +348,7 @@ Important:
   scheduledFor: null,
   posts,
   createdAt: new Date().toISOString(),
-  enviroment
+  environment
 };
 
 await savePostRecord(record);

@@ -962,7 +962,8 @@ if (!clientId) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ topic, tone, type, clientId })
+	const platform = document.getElementById("platform").value;
+        body: JSON.stringify({ topic, tone, type, platform, clientId })
       });
 
       const data = await response.json();
@@ -1197,17 +1198,18 @@ async function suggestFeature() {
     return;
   }
 
-  const clientId = localStorage.getItem("clientId") || "anonymous";
+  const clientId = localStorage.getItem("inkova_client_id") || "anonymous";
 
   try {
-    const res = await fetch("https://ghostwriter-backend-xx4m.onrender.com/feature-request", {
+    const res = await fetch(`${API_BASE_URL}/feedback`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         clientId,
-        message: message.trim()
+        message: message.trim(),
+	type: "feature"
       })
     });
 
@@ -1224,35 +1226,59 @@ async function suggestFeature() {
   }
 }
 
-  function reportBug() {
-    const subject = encodeURIComponent("Inkova bug report");
-    const body = encodeURIComponent(
-`Hi Inkova team,
+ async function reportBug() {
+  const message = prompt(
+`Describe the bug:
 
-I found a bug:
+What happened?
+What did you expect?
+Steps to reproduce?`
+  );
 
-What happened:
-[describe the issue]
+  if (!message || message.trim().length < 5) {
+    return;
+  }
 
-What I expected:
-[describe expected behavior]
+  const clientId = localStorage.getItem("inkova_client_id") || "anonymous";
+
+  const fullMessage = `
+BUG REPORT
+
+${message}
 
 Page:
 ${window.location.href}
 
 Device/Browser:
 ${navigator.userAgent}
+`;
 
-Steps to reproduce:
-1.
-2.
-3.
-`
-    );
+  try {
+    const res = await fetch(`${API_BASE_URL}/feedback`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        clientId,
+        message: fullMessage.trim(),
+        type: "bug"
+      })
+    });
 
-    window.location.href = `mailto:JBond@InkovaTech.com?subject=${subject}&body=${body}`;
+    const data = await res.json();
+    console.log("bug response:", res.status, data);
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to submit bug report");
+    }
+
+    alert("Bug report submitted. Thanks!");
+  } catch (err) {
+    console.error(err);
+    alert("Could not submit bug report. Try again.");
   }
-</script>
+}
 </script>
 </body>
 </html>
