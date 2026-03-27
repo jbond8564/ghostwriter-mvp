@@ -138,17 +138,6 @@ async function incrementUsage(clientId) {
   if (updateError) throw updateError;
     }
 
-    if (insertError) throw insertError;
-    return;
-
-  const { error: updateError } = await supabase
-    .from("usage")
-    .update({ count: data.count + 1 })
-    .eq("id", data.id);
-
-  if (updateError) throw updateError;
-}
-
 const ALLOWED_TONES = new Set(["funny", "edgy", "professional"]);
 const ALLOWED_TYPES = new Set([
   "drink",
@@ -268,7 +257,6 @@ if (!isDev && currentUsage >= DAILY_FREE_LIMIT) {
     const tone = safeTrim(req.body?.tone, "professional").toLowerCase();
     const type = safeTrim(req.body?.type, "drink").toLowerCase();
     const platform = safeTrim(req.body?.platform).toLowerCase();
-    const ALLOWED_PLATFORMS = new Set(["instagram", "facebook", "tiktok", "x"]);
 
     if (!topic || topic.length < 2) {
       return res.status(400).json({
