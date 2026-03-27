@@ -141,7 +141,7 @@ const ALLOWED_TYPES = new Set([
   "happy-hour",
   "weekend-special"
 ]);
-const ALLOWED_PLATFORMS = new Set(["Instagram", "Facebook", "TikTok", "X"]);
+
 const ALLOWED_REPEATS = new Set(["One time", "Daily", "Weekly"]);
 
 function safeTrim(value, fallback = "") {
@@ -197,20 +197,23 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.post("/feature-request", async (req, res) => {
+app.post("/feedback", async (req, res) => {
   try {
-    const { clientId, message } = req.body;
+    const { clientId, message, type } = req.body;
 
     if (!message || message.trim().length < 3) {
-      return res.status(400).json({ error: "Feature request is too short" });
+      return res.status(400).json({ error: "Message is too short" });
     }
+
+    const safeType = type === "bug" ? "bug" : "feature";
 
     const { error } = await supabase
       .from("feedback")
       .insert([
         {
           client_id: clientId || "anonymous",
-          message: message.trim()
+          message: message.trim(),
+          type: safeType
         }
       ]);
 
@@ -218,8 +221,8 @@ app.post("/feature-request", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error("Feature request error:", err);
-    res.status(500).json({ error: "Failed to save feature request" });
+    console.error("Feedback error:", err);
+    res.status(500).json({ error: "Failed to save feedback" });
   }
 });
 
@@ -228,6 +231,7 @@ app.post("/generate", async (req, res) => {
     const topic = safeTrim(req.body?.topic);
     const clientId = safeTrim(req.body?.clientId);
     const environment = process.env.APP_ENV || "prod";
+
 
 if (!clientId) {
   return res.status(400).json({ error: "Missing clientId" });
@@ -243,7 +247,8 @@ if (currentUsage >= DAILY_FREE_LIMIT) {
 }
     const tone = safeTrim(req.body?.tone, "professional").toLowerCase();
     const type = safeTrim(req.body?.type, "drink").toLowerCase();
-    const platform = safeTrim(req.body?.platform, "generic").toLowerCase();
+    const platform = safeTrim(req.body?.platform).toLowerCase();
+    const ALLOWED_PLATFORMS = new Set(["instagram", "facebook", "tiktok", "x"]);
 
     if (!topic || topic.length < 2) {
       return res.status(400).json({
@@ -268,6 +273,12 @@ if (currentUsage >= DAILY_FREE_LIMIT) {
         error: "Invalid content type selected."
       });
     }
+
+    if (!ALLOWED_PLATFORMS.has(platform)) {
+      return res.status(400).json({
+       error: "Invalid platform selected."
+      });
+     }
 
     const typeMap = {
       drink: "Drink Promo",

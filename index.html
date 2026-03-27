@@ -716,6 +716,16 @@
               <option value="weekend-special">Weekend Special</option>
             </select>
           </div>
+
+	 <div class="field">
+           <label for="platform">Platform</label>
+	   <select id="platform">
+   	      <option value="instagram">Instagram</option>
+   	      <option value="facebook">Facebook</option>
+   	      <option value="tiktok">TikTok</option>
+  	      <option value="x">X</option>
+            </select>
+           </div>
         </div>
 
         <div class="button-row">
@@ -933,40 +943,40 @@ if (!clientId) {
   localStorage.setItem("inkova_client_id", clientId);
 }
 
-  async function generatePosts() {
-    const topic = document.getElementById("topic").value.trim();
-    const tone = document.getElementById("tone").value;
-    const type = document.getElementById("type").value;
-    const status = document.getElementById("status");
-    const results = document.getElementById("results");
+async function generatePosts() {
+  const topic = document.getElementById("topic").value.trim();
+  const tone = document.getElementById("tone").value;
+  const type = document.getElementById("type").value;
+  const platform = document.getElementById("platform").value;
+  const status = document.getElementById("status");
+  const results = document.getElementById("results");
 
-    if (!topic) {
-      status.textContent = "Enter a topic first.";
-      results.innerHTML = "";
-      return;
-    }
-
-    if (getRemainingUses() <= 0) {
-      showPaywall();
-      status.textContent = "You’ve reached today’s free limit.";
-      return;
-    }
-
-    status.textContent = "Generating content...";
+  if (!topic) {
+    status.textContent = "Enter a topic first.";
     results.innerHTML = "";
-    latestPosts = [];
+    return;
+  }
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/generate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-	const platform = document.getElementById("platform").value;
-        body: JSON.stringify({ topic, tone, type, platform, clientId })
-      });
+  if (getRemainingUses() <= 0) {
+    showPaywall();
+    status.textContent = "You’ve reached today’s free limit.";
+    return;
+  }
 
-      const data = await response.json();
+  status.textContent = "Generating content...";
+  results.innerHTML = "";
+  latestPosts = [];
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ topic, tone, type, platform, clientId })
+    });
+
+    const data = await response.json();
 
 if (response.status === 429) {
   status.textContent = "You’ve reached today’s free limit.";
