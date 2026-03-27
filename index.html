@@ -962,7 +962,7 @@ if (!clientId) {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ topic, tone, type, clientId })
+        body: JSON.stringify({ topic, tone, type, platform, clientId })
       });
 
       const data = await response.json();
