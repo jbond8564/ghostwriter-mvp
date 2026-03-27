@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 const ALLOWED_ORIGINS = [
   "https://inkovatech.com",
   "https://www.inkovatech.com",
-  "https://ghostwriter-mvp.netlify.app"
+  "https://ghostwriter-mvp.netlify.app",
   "https://dev--ghostwriter-mvp.netlify.app"
 ];
 
