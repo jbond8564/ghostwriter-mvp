@@ -84,7 +84,8 @@ async function savePostRecord(record) {
         status: record.status,
         scheduled_for: record.scheduledFor,
         posts: record.posts,
-        created_at: record.createdAt
+        created_at: record.createdAt,
+        enviroment: record.enviroment
       }
     ])
     .select()
@@ -226,7 +227,8 @@ app.post("/feature-request", async (req, res) => {
 app.post("/generate", async (req, res) => {
   try {
     const topic = safeTrim(req.body?.topic);
-const clientId = safeTrim(req.body?.clientId);
+    const clientId = safeTrim(req.body?.clientId);
+    const enviroment = process.env.APP_ENV || "prod";
 
 if (!clientId) {
   return res.status(400).json({ error: "Missing clientId" });
@@ -346,7 +348,8 @@ Important:
   status: "generated",
   scheduledFor: null,
   posts,
-  createdAt: new Date().toISOString()
+  createdAt: new Date().toISOString(),
+  enviroment
 };
 
 await savePostRecord(record);
