@@ -136,7 +136,6 @@ async function incrementUsage(clientId) {
     .eq("id", data.id);
 
   if (updateError) throw updateError;
-}
         }
       ]);
 
@@ -185,7 +184,7 @@ function parsePostsFromOutput(outputText) {
         .filter(Boolean)
         .slice(0, 5);
     }
-  } catch (err) {
+    catch (err) {
     // Fall through to line parsing
   }
 
