@@ -144,6 +144,8 @@ const ALLOWED_TYPES = new Set([
 
 const ALLOWED_REPEATS = new Set(["One time", "Daily", "Weekly"]);
 
+const ALLOWED_PLATFORMS = new Set(["instagram", "facebook", "tiktok", "x"]);
+
 function safeTrim(value, fallback = "") {
   return typeof value === "string" ? value.trim() || fallback : fallback;
 }
