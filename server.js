@@ -15,6 +15,7 @@ const ALLOWED_ORIGINS = [
   "https://inkovatech.com",
   "https://www.inkovatech.com",
   "https://ghostwriter-mvp.netlify.app"
+  "https://dev--ghostwriter-mvp.netlify.app"
 ];
 
 app.use(
