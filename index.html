@@ -309,7 +309,15 @@
     .field.full {
       grid-column: 1 / -1;
     }
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
 
+.button-row .ghost-btn {
+  flex: 1; /* makes them equal width */
+}
     .field {
       display: flex;
       flex-direction: column;
@@ -744,9 +752,10 @@
             <div class="empty-state">No generations yet.</div>
           </div>
         </div>
-<button class="ghost-btn" onclick="reportBug()">Report a Bug</button>
-      </div>
-    </div>
+<div class="button-row">
+  <button class="ghost-btn" onclick="reportBug()">Report a Bug</button>
+  <button class="ghost-btn" onclick="suggestFeature()">💡 Suggest Feature</button>
+</div> 
   </div>
 </main>
 
@@ -1178,6 +1187,40 @@ async function submitEmail() {
   } catch (error) {
     console.error("Waitlist error:", error);
     alert("Server error. Try again.");
+  }
+}
+
+async function suggestFeature() {
+  const message = prompt("What feature would you like to see?");
+
+  if (!message || message.trim().length < 3) {
+    return;
+  }
+
+  const clientId = localStorage.getItem("clientId") || "anonymous";
+
+  try {
+    const res = await fetch("https://ghostwriter-backend-xx4m.onrender.com/feature-request", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        clientId,
+        message: message.trim()
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to submit feature request");
+    }
+
+    alert("Thanks — your feature idea was submitted.");
+  } catch (err) {
+    console.error(err);
+    alert("Could not submit feature request. Please try again.");
   }
 }
 

@@ -30,8 +30,9 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     }
   })
+);
 
-);app.use(express.json());
+app.use(express.json());
 
 if (!process.env.OPENAI_API_KEY) {
   console.error("Missing OPENAI_API_KEY");
@@ -165,6 +166,32 @@ app.get("/health", (req, res) => {
     service: "Inkova Social API",
     time: new Date().toISOString()
   });
+});
+
+app.post("/feature-request", async (req, res) => {
+  try {
+    const { clientId, message } = req.body;
+
+    if (!message || message.trim().length < 3) {
+      return res.status(400).json({ error: "Feature request is too short" });
+    }
+
+    const { error } = await supabase
+      .from("feedback")
+      .insert([
+        {
+          client_id: clientId || "anonymous",
+          message: message.trim()
+        }
+      ]);
+
+    if (error) throw error;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Feature request error:", err);
+    res.status(500).json({ error: "Failed to save feature request" });
+  }
 });
 
 app.post("/generate", async (req, res) => {
