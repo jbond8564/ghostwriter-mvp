@@ -241,7 +241,9 @@ if (!clientId) {
 
 const currentUsage = await getUsage(clientId);
 
-if (currentUsage >= DAILY_FREE_LIMIT) {
+const isDev = process.env.APP_ENV === "dev";
+
+if (!isDev && currentUsage >= DAILY_FREE_LIMIT) {
   return res.status(429).json({
     error: "Daily limit reached",
     limit: DAILY_FREE_LIMIT

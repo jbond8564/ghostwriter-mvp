@@ -640,7 +640,7 @@
   <div class="app-shell">
     <aside class="sidebar">
   <div class="brand">
-    <div class="eyebrow">Early Access</div>
+    <div class="eyebrow">DEVELOPMENT</div>
     <h1>Inkova</h1>
     <p>Create. Schedule. Grow your content instantly.</p>
     <div class="panel">
@@ -957,12 +957,12 @@ async function generatePosts() {
     return;
   }
 
-  if (getRemainingUses() <= 0) {
-    showPaywall();
-    status.textContent = "You’ve reached today’s free limit.";
-    return;
-  }
+const IS_DEV = window.location.hostname.includes("dev");
 
+if (!IS_DEV && getRemainingUses() <= 0) {
+  showPaywall();
+  return;
+}
   status.textContent = "Generating content...";
   results.innerHTML = "";
   latestPosts = [];
