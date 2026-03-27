@@ -137,7 +137,6 @@ async function incrementUsage(clientId) {
 
   if (updateError) throw updateError;
     }
-      ]);
 
     if (insertError) throw insertError;
     return;
