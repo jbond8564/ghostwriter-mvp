@@ -1200,18 +1200,20 @@ async function suggestFeature() {
   const clientId = localStorage.getItem("clientId") || "anonymous";
 
   try {
-    const res = await fetch("https://ghostwriter-backend-xx4m.onrender.com/feature-request", {
+    const res = await fetch("https://ghostwriter-backend-xx4m.onrender.com/feedback", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         clientId,
-        message: message.trim()
+        message: message.trim(),
+        type: "feature"
       })
     });
 
     const data = await res.json();
+    console.log("feedback response:", res.status, data);
 
     if (!res.ok) {
       throw new Error(data.error || "Failed to submit feature request");

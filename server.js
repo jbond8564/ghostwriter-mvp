@@ -168,20 +168,24 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.post("/feature-request", async (req, res) => {
+app.post("/feedback", async (req, res) => {
   try {
-    const { clientId, message } = req.body;
+    const { clientId, message, type } = req.body;
 
     if (!message || message.trim().length < 3) {
-      return res.status(400).json({ error: "Feature request is too short" });
+      return res.status(400).json({ error: "Message is too short" });
     }
+
+    const allowedTypes = ["bug", "feature"];
+    const safeType = allowedTypes.includes(type) ? type : "feature";
 
     const { error } = await supabase
       .from("feedback")
       .insert([
         {
           client_id: clientId || "anonymous",
-          message: message.trim()
+          message: message.trim(),
+          type: safeType
         }
       ]);
 
@@ -189,11 +193,12 @@ app.post("/feature-request", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error("Feature request error:", err);
-    res.status(500).json({ error: "Failed to save feature request" });
+    console.error("Feedback error:", err);
+    res.status(500).json({
+      error: err.message || "Failed to save feedback"
+    });
   }
 });
-
 app.post("/generate", async (req, res) => {
   try {
     const topic = safeTrim(req.body?.topic);
