@@ -335,15 +335,6 @@ Important:
     }
 
     const record = {
-      id: crypto.randomUUID(),
-      topic,
-      tone,
-      type,
-      posts,
-      createdAt: new Date().toISOString()
-    };
-
-    const record = {
   id: crypto.randomUUID(),
   clientId,
   topic,
@@ -366,19 +357,18 @@ res.json({
     generatedAt: record.createdAt
   }
 });
+} catch (error) {
+  console.error("Generate error:", error);
 
-  } catch (error) {
-    console.error("Generate error:", error);
+  const message =
+    error?.error?.message ||
+    error?.message ||
+    "Something went wrong on the server.";
 
-    const message =
-      error?.error?.message ||
-      error?.message ||
-      "Something went wrong on the server.";
-
-    res.status(500).json({
-      error: message
-    });
-  }
+  res.status(500).json({
+    error: message
+  });
+}
 });
 
 app.get("/posts", async (req, res) => {
