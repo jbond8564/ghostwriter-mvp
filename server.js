@@ -355,17 +355,15 @@ Return a JSON object in this exact format:
 Write exactly 3 social media captions for each day of the week.
 
 Promotions Calendar:
-Monday: ${promotionsCalendar.monday || "None"}
-Tuesday: ${promotionsCalendar.tuesday || "None"}
-Wednesday: ${promotionsCalendar.wednesday || "None"}
-Thursday: ${promotionsCalendar.thursday || "None"}
-Friday: ${promotionsCalendar.friday || "None"}
-Saturday: ${promotionsCalendar.saturday || "None"}
-Sunday: ${promotionsCalendar.sunday || "None"}
+Monday: ${promotionsCalendar.monday.text || "None"} (${typeMap[promotionsCalendar.monday.type] || "Promotion"})
+Tuesday: ${promotionsCalendar.tuesday.text || "None"} (${typeMap[promotionsCalendar.tuesday.type] || "Promotion"})
+Wednesday: ${promotionsCalendar.wednesday.text || "None"} (${typeMap[promotionsCalendar.wednesday.type] || "Promotion"})
+Thursday: ${promotionsCalendar.thursday.text || "None"} (${typeMap[promotionsCalendar.thursday.type] || "Promotion"})
+Friday: ${promotionsCalendar.friday.text || "None"} (${typeMap[promotionsCalendar.friday.type] || "Promotion"})
+Saturday: ${promotionsCalendar.saturday.text || "None"} (${typeMap[promotionsCalendar.saturday.type] || "Promotion"})
+Sunday: ${promotionsCalendar.sunday.text || "None"} (${typeMap[promotionsCalendar.sunday.type] || "Promotion"})
 
 Tone: ${tone}
-Content type: ${typeLabel}
-Platform: ${platform}
 
 Use the selected content type as the main writing angle for every day, while still tailoring each caption to that day's specific promotion, event, or special.
 
