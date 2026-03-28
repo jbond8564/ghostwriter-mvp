@@ -78,7 +78,7 @@ async function savePostRecord(record) {
       {
         id: record.id,
         client_id: record.clientId,
-        topic: record.topic,
+        promotions_calendar: record.promotionsCalendar,
         tone: record.tone,
         type: record.type,
         platform: record.platform,
@@ -159,37 +159,59 @@ function parsePostsFromOutput(outputText) {
   const text = safeTrim(outputText);
 
   if (!text) {
-    return [];
+    return null;
   }
+
+  const days = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday"
+  ];
+
+  const emptyCalendar = {
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: []
+  };
 
   // First try JSON
   try {
     const parsed = JSON.parse(text);
-    if (Array.isArray(parsed.posts)) {
-      return parsed.posts
-        .map((post) => safeTrim(post))
-        .filter(Boolean)
-        .slice(0, 5);
+
+    if (!parsed || typeof parsed !== "object" || !parsed.posts || typeof parsed.posts !== "object") {
+      return emptyCalendar;
     }
-   } catch (err) {
-    // Fall through to line parsing
+
+    const cleanedPosts = {};
+
+    for (const day of days) {
+      const dayPosts = parsed.posts[day];
+
+      if (Array.isArray(dayPosts)) {
+        cleanedPosts[day] = dayPosts
+          .map((post) => safeTrim(post))
+          .filter(Boolean)
+          .slice(0, 3);
+      } else {
+        cleanedPosts[day] = [];
+      }
+    }
+
+    return cleanedPosts;
+  } catch (err) {
+    // Fall through
   }
 
-  // Fallback: split by blank lines, then by lines if needed
-  const byParagraph = text
-    .split(/\n\s*\n/)
-    .map((chunk) => safeTrim(chunk))
-    .filter(Boolean);
-
-  if (byParagraph.length >= 5) {
-    return byParagraph.slice(0, 5);
-  }
-
-  return text
-    .split("\n")
-    .map((line) => line.replace(/^[-*\d.)\s]+/, "").trim())
-    .filter(Boolean)
-    .slice(0, 5);
+  // If JSON parsing fails, return empty calendar
+  return emptyCalendar;
 }
 
 app.get("/", (req, res) => {
@@ -235,7 +257,6 @@ app.post("/feedback", async (req, res) => {
 
 app.post("/generate", async (req, res) => {
   try {
-    const topic = safeTrim(req.body?.topic);
     const clientId = safeTrim(req.body?.clientId);
     const environment = process.env.APP_ENV || "prod";
 
@@ -254,68 +275,104 @@ if (!isDev && currentUsage >= DAILY_FREE_LIMIT) {
     limit: DAILY_FREE_LIMIT
   });
 }
-    const tone = safeTrim(req.body?.tone, "professional").toLowerCase();
-    const type = safeTrim(req.body?.type, "drink").toLowerCase();
-    const platform = safeTrim(req.body?.platform).toLowerCase();
 
-    if (!topic || topic.length < 2) {
-      return res.status(400).json({
-        error: "Topic is required."
-      });
-    }
+const tone = safeTrim(req.body?.tone, "professional").toLowerCase();
+const type = safeTrim(req.body?.type, "drink").toLowerCase();
+const platform = safeTrim(req.body?.platform).toLowerCase();
 
-    if (topic.length > 160) {
-      return res.status(400).json({
-        error: "Topic is too long."
-      });
-    }
+const promotionsCalendar = {
+  monday: safeTrim(req.body?.monday),
+  tuesday: safeTrim(req.body?.tuesday),
+  wednesday: safeTrim(req.body?.wednesday),
+  thursday: safeTrim(req.body?.thursday),
+  friday: safeTrim(req.body?.friday),
+  saturday: safeTrim(req.body?.saturday),
+  sunday: safeTrim(req.body?.sunday)
+};
 
-    if (!ALLOWED_TONES.has(tone)) {
-      return res.status(400).json({
-        error: "Invalid tone selected."
-      });
-    }
+const hasAtLeastOneDay = Object.values(promotionsCalendar).some(
+  (value) => value && value.length >= 2
+);
 
-    if (!ALLOWED_TYPES.has(type)) {
-      return res.status(400).json({
-        error: "Invalid content type selected."
-      });
-    }
+if (!hasAtLeastOneDay) {
+  return res.status(400).json({
+    error: "At least one day in the promotions calendar is required."
+  });
+}
 
-    if (!ALLOWED_PLATFORMS.has(platform)) {
-      return res.status(400).json({
-       error: "Invalid platform selected."
-      });
-     }
+for (const [day, value] of Object.entries(promotionsCalendar)) {
+  if (value && value.length > 160) {
+    return res.status(400).json({
+      error: `${day} is too long. Keep each calendar entry under 160 characters.`
+    });
+  }
+}
 
-    const typeMap = {
-      drink: "Drink Promo",
-      food: "Food Special",
-      event: "Event Promotion",
-      "happy-hour": "Happy Hour",
-      "weekend-special": "Weekend Special"
-    };
+if (!ALLOWED_TONES.has(tone)) {
+  return res.status(400).json({
+    error: "Invalid tone selected."
+  });
+}
 
-    const typeLabel = typeMap[type] || "Promotion";
+if (!ALLOWED_TYPES.has(type)) {
+  return res.status(400).json({
+    error: "Invalid content type selected."
+  });
+}
 
-    const prompt = `
+if (!ALLOWED_PLATFORMS.has(platform)) {
+  return res.status(400).json({
+    error: "Invalid platform selected."
+  });
+}
+
+const typeMap = {
+  drink: "Drink Promo",
+  food: "Food Special",
+  event: "Event Promotion",
+  "happy-hour": "Happy Hour",
+  "weekend-special": "Weekend Special"
+};
+
+const typeLabel = typeMap[type] || "Promotion";
+
+const prompt = `
 You are a strong social media copywriter for bars, restaurants, nightlife venues, and local food spots.
 
 Return a JSON object in this exact format:
 {
-  "posts": ["caption 1", "caption 2", "caption 3", "caption 4", "caption 5"]
+  "posts": {
+    "monday": ["caption 1", "caption 2", "caption 3"],
+    "tuesday": ["caption 1", "caption 2", "caption 3"],
+    "wednesday": ["caption 1", "caption 2", "caption 3"],
+    "thursday": ["caption 1", "caption 2", "caption 3"],
+    "friday": ["caption 1", "caption 2", "caption 3"],
+    "saturday": ["caption 1", "caption 2", "caption 3"],
+    "sunday": ["caption 1", "caption 2", "caption 3"]
+  }
 }
 
-Write exactly 5 social media captions.
+Write exactly 3 social media captions for each day of the week.
 
-Topic: ${topic}
+Promotions Calendar:
+Monday: ${promotionsCalendar.monday || "None"}
+Tuesday: ${promotionsCalendar.tuesday || "None"}
+Wednesday: ${promotionsCalendar.wednesday || "None"}
+Thursday: ${promotionsCalendar.thursday || "None"}
+Friday: ${promotionsCalendar.friday || "None"}
+Saturday: ${promotionsCalendar.saturday || "None"}
+Sunday: ${promotionsCalendar.sunday || "None"}
+
 Tone: ${tone}
 Content type: ${typeLabel}
+Platform: ${platform}
+
+Use the selected content type as the main writing angle for every day, while still tailoring each caption to that day's specific promotion, event, or special.
 
 Requirements:
 - Each caption must feel natural, human, and ready to post
 - Each caption should be different in structure and phrasing
-- Keep each caption between 1 and 3 short sentences
+- Keep each caption between 2 and 5 short sentences
 - Make them sound confident, specific, and local-business friendly
 - Avoid sounding robotic, cheesy, or corporate
 - Avoid repeating the same opening pattern
@@ -324,6 +381,7 @@ Requirements:
 - Do not use emojis
 - Do not put quotation marks around the captions themselves
 - Return only valid JSON
+- If a day says "None", return an empty array for that day
 
 Style guidance by content type:
 - Drink Promo: make it tempting, fun, craveable, and a little bold
@@ -339,27 +397,37 @@ Style guidance by tone:
 
 Important:
 - Make the captions sound like they were written by someone who understands hospitality marketing
-- Vary the energy and rhythm across the 5 captions
-- Make at least 2 captions feel especially strong and post-ready with almost no editing
+- Vary the energy and rhythm across the captions
+- Make at least 1 caption per day feel especially strong and post-ready with almost no editing
 `;
 
-    const response = await client.responses.create({
-      model: "gpt-5.4",
-      input: prompt
-    });
+const response = await client.responses.create({
+  model: "gpt-5.4",
+  input: prompt
+});
 
-    const posts = parsePostsFromOutput(response.output_text);
+const posts = parsePostsFromOutput(response.output_text);
 
-    if (!posts.length) {
-      return res.status(500).json({
-        error: "No posts were generated."
-      });
-    }
+if (!posts || typeof posts !== "object") {
+  return res.status(500).json({
+    error: "No promotions calendar posts were generated."
+  });
+}
 
-    const record = {
+const hasAnyPosts = Object.values(posts).some(
+  (dayPosts) => Array.isArray(dayPosts) && dayPosts.length > 0
+);
+
+if (!hasAnyPosts) {
+  return res.status(500).json({
+    error: "No promotions calendar posts were generated."
+  });
+}
+
+const record = {
   id: crypto.randomUUID(),
   clientId,
-  topic,
+  promotionsCalendar,
   tone,
   type,
   platform,
@@ -377,24 +445,12 @@ res.json({
   posts,
   recordId: record.id,
   meta: {
-    topic,
+    promotionsCalendar,
     tone,
     type,
     generatedAt: record.createdAt
   }
-});
-  } catch (error) {
-    console.error("Generate error:", error);
-
-    const message =
-      error?.error?.message ||
-      error?.message ||
-      "Something went wrong on the server.";
-
-    res.status(500).json({
-      error: message
     });
-  }
 });
 
 app.get("/posts", async (req, res) => {

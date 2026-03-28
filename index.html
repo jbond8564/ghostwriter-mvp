@@ -688,14 +688,17 @@
         </p>
 
         <div class="grid">
-          <div class="field full">
-            <label for="topic">What do you want to post about?</label>
-            <input
-              id="topic"
-              type="text"
-              placeholder="e.g. new menu launch, weekend promo, event announcement"
-            />
-          </div>
+       <div class="field full">
+  <label>Build Your Promotions Calendar</label>
+
+  <input id="monday" placeholder="Monday (e.g. Margarita Monday)" />
+  <input id="tuesday" placeholder="Tuesday (e.g. Taco Tuesday)" />
+  <input id="wednesday" placeholder="Wednesday (e.g. Wing Night)" />
+  <input id="thursday" placeholder="Thursday (e.g. Trivia Night)" />
+  <input id="friday" placeholder="Friday (e.g. Live DJ)" />
+  <input id="saturday" placeholder="Saturday (e.g. DJ + Drink Specials)" />
+  <input id="sunday" placeholder="Sunday (e.g. Bloody Mary Bar)" />
+</div>
 
           <div class="field">
             <label for="tone">Tone</label>
@@ -857,33 +860,53 @@
   }
 
   function renderHistory(records) {
-    const container = document.getElementById("historyList");
+  const container = document.getElementById("historyList");
 
-    if (!records || !records.length) {
-      container.innerHTML = `<div class="empty-state">No generations yet.</div>`;
-      return;
-    }
-
-    container.innerHTML = records
-      .slice(0, 5)
-      .map((record) => {
-        const preview =
-          Array.isArray(record.posts) && record.posts.length
-            ? record.posts[0]
-            : "No preview available";
-
-        return `
-          <div class="list-item">
-            <div class="list-item-top">
-              <div class="list-item-title">${record.type || "content"} • ${record.tone || "tone"}</div>
-              <span class="status-pill">Generated</span>
-            </div>
-            <p class="list-item-text">${truncateText(preview)}</p>
-          </div>
-        `;
-      })
-      .join("");
+  if (!records || !records.length) {
+    container.innerHTML = `<div class="empty-state">No generations yet.</div>`;
+    return;
   }
+
+  const days = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday"
+  ];
+
+  container.innerHTML = records
+    .slice(0, 5)
+    .map((record) => {
+      let preview = "No preview available";
+      let previewDay = "";
+
+      if (record.posts && typeof record.posts === "object") {
+        for (const day of days) {
+          const dayPosts = record.posts[day];
+          if (Array.isArray(dayPosts) && dayPosts.length) {
+            preview = dayPosts[0];
+            previewDay = day.charAt(0).toUpperCase() + day.slice(1);
+            break;
+          }
+        }
+      }
+
+      return `
+        <div class="list-item">
+          <div class="list-item-top">
+            <div class="list-item-title">${record.type || "content"} • ${record.tone || "tone"}</div>
+            <span class="status-pill">Generated</span>
+          </div>
+          <p class="list-item-text">${truncateText(preview)}</p>
+          <div class="small" style="margin-top: 8px;">${previewDay ? `Preview: ${previewDay}` : ""}</div>
+        </div>
+      `;
+    })
+    .join("");
+}
 
   function renderScheduled(items) {
     const container = document.getElementById("scheduledList");
@@ -944,25 +967,49 @@ if (!clientId) {
 }
 
 async function generatePosts() {
-  const topic = document.getElementById("topic").value.trim();
   const tone = document.getElementById("tone").value;
   const type = document.getElementById("type").value;
   const platform = document.getElementById("platform").value;
   const status = document.getElementById("status");
   const results = document.getElementById("results");
 
-  if (!topic) {
-    status.textContent = "Enter a topic first.";
+  const payload = {
+    monday: document.getElementById("monday").value.trim(),
+    tuesday: document.getElementById("tuesday").value.trim(),
+    wednesday: document.getElementById("wednesday").value.trim(),
+    thursday: document.getElementById("thursday").value.trim(),
+    friday: document.getElementById("friday").value.trim(),
+    saturday: document.getElementById("saturday").value.trim(),
+    sunday: document.getElementById("sunday").value.trim(),
+    tone,
+    type,
+    platform,
+    clientId
+  };
+
+  const hasInput = [
+    payload.monday,
+    payload.tuesday,
+    payload.wednesday,
+    payload.thursday,
+    payload.friday,
+    payload.saturday,
+    payload.sunday
+  ].some((value) => value.length > 1);
+
+  if (!hasInput) {
+    status.textContent = "Enter at least one day in your promotions calendar.";
     results.innerHTML = "";
     return;
   }
 
-const IS_DEV = window.location.hostname.includes("dev");
+  const IS_DEV = window.location.hostname.includes("dev");
 
-if (!IS_DEV && getRemainingUses() <= 0) {
-  showPaywall();
-  return;
-}
+  if (!IS_DEV && getRemainingUses() <= 0) {
+    showPaywall();
+    return;
+  }
+
   status.textContent = "Generating content...";
   results.innerHTML = "";
   latestPosts = [];
@@ -973,51 +1020,72 @@ if (!IS_DEV && getRemainingUses() <= 0) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ topic, tone, type, platform, clientId })
+      body: JSON.stringify(payload)
     });
 
     const data = await response.json();
 
-if (response.status === 429) {
-  status.textContent = "You’ve reached today’s free limit.";
-  showPaywall();
-  updateUsageUI();
-  return;
-}
+    if (response.status === 429) {
+      status.textContent = "You’ve reached today’s free limit.";
+      showPaywall();
+      updateUsageUI();
+      return;
+    }
 
-if (!response.ok) {
-  status.textContent = data.error || "Server error.";
-  return;
-}
+    if (!response.ok) {
+      status.textContent = data.error || "Server error.";
+      return;
+    }
 
-      setUsageCount(getUsageCount() + 1);
-      latestPosts = data.posts;
-      status.textContent = "Posts generated.";
+    setUsageCount(getUsageCount() + 1);
+    latestPosts = Object.values(data.posts || {}).flat();
+    status.textContent = "Posts generated.";
 
-      data.posts.forEach((post, index) => {
-        const card = document.createElement("div");
-        card.className = "post-card";
+    const days = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday"
+    ];
 
-        const top = document.createElement("div");
-        top.className = "post-card-top";
+    days.forEach((day) => {
+      const dayPosts = data.posts?.[day];
 
-        const postIndex = document.createElement("div");
-        postIndex.className = "post-index";
-        postIndex.textContent = `Post ${index + 1}`;
+      if (!Array.isArray(dayPosts) || !dayPosts.length) {
+        return;
+      }
 
-        const postTag = document.createElement("span");
-        postTag.className = "status-pill";
-        postTag.textContent = "Ready to review";
+      const section = document.createElement("div");
+      section.className = "post-card";
 
-        top.appendChild(postIndex);
-        top.appendChild(postTag);
+      const top = document.createElement("div");
+      top.className = "post-card-top";
 
+      const dayTitle = document.createElement("div");
+      dayTitle.className = "post-index";
+      dayTitle.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+
+      const postTag = document.createElement("span");
+      postTag.className = "status-pill";
+      postTag.textContent = "Ready to review";
+
+      top.appendChild(dayTitle);
+      top.appendChild(postTag);
+      section.appendChild(top);
+
+      dayPosts.forEach((post, index) => {
         const text = document.createElement("p");
         text.className = "post-text";
         text.textContent = post;
+        section.appendChild(text);
 
         const actions = document.createElement("div");
         actions.className = "post-actions";
+
+        const flatIndex = latestPosts.indexOf(post);
 
         const copyButton = document.createElement("button");
         copyButton.className = "copy-btn";
@@ -1025,7 +1093,7 @@ if (!response.ok) {
         copyButton.onclick = async () => {
           try {
             await navigator.clipboard.writeText(post);
-            status.textContent = "Post copied.";
+            status.textContent = `${dayTitle.textContent} post copied.`;
           } catch (error) {
             status.textContent = "Could not copy.";
           }
@@ -1034,29 +1102,30 @@ if (!response.ok) {
         const scheduleButton = document.createElement("button");
         scheduleButton.className = "schedule-btn";
         scheduleButton.textContent = "Open Draft Schedule";
-        scheduleButton.onclick = () => toggleSchedulePanel(index);
+        scheduleButton.onclick = () => toggleSchedulePanel(flatIndex);
 
         actions.appendChild(copyButton);
         actions.appendChild(scheduleButton);
+        section.appendChild(actions);
 
         const schedulePanel = document.createElement("div");
         schedulePanel.className = "schedule-panel";
-        schedulePanel.id = `schedule-panel-${index}`;
+        schedulePanel.id = `schedule-panel-${flatIndex}`;
         schedulePanel.innerHTML = `
           <div class="schedule-title">Save this post as a draft</div>
           <div class="schedule-grid">
             <div class="field">
               <label>Channel</label>
-              <select id="platform-${index}">
-                 <option value="instagram">Instagram</option>
-                 <option value="facebook">Facebook</option>
-                 <option value="tiktok">TikTok</option>
-                 <option value="x">X</option>
-               </select>
+              <select id="platform-${flatIndex}">
+                <option value="instagram">Instagram</option>
+                <option value="facebook">Facebook</option>
+                <option value="tiktok">TikTok</option>
+                <option value="x">X</option>
+              </select>
             </div>
             <div class="field">
               <label>Repeat</label>
-              <select id="repeat-${index}">
+              <select id="repeat-${flatIndex}">
                 <option>One time</option>
                 <option>Daily</option>
                 <option>Weekly</option>
@@ -1064,34 +1133,33 @@ if (!response.ok) {
             </div>
             <div class="field">
               <label>Date</label>
-              <input id="date-${index}" type="date" />
+              <input id="date-${flatIndex}" type="date" />
             </div>
             <div class="field">
               <label>Time</label>
-              <input id="time-${index}" type="time" />
+              <input id="time-${flatIndex}" type="time" />
             </div>
           </div>
           <div class="button-row">
-            <button class="primary-btn" onclick="realSchedule(${index})">Save Draft</button>
-            <button class="ghost-btn" onclick="hideSchedulePanel(${index})">Cancel</button>
+            <button class="primary-btn" onclick="realSchedule(${flatIndex})">Save Draft</button>
+            <button class="ghost-btn" onclick="hideSchedulePanel(${flatIndex})">Cancel</button>
           </div>
-          <div class="small" id="schedule-message-${index}" style="margin-top:10px;"></div>
+          <div class="small" id="schedule-message-${flatIndex}" style="margin-top:10px;"></div>
         `;
 
-        card.appendChild(top);
-        card.appendChild(text);
-        card.appendChild(actions);
-        card.appendChild(schedulePanel);
-        results.appendChild(card);
+        section.appendChild(schedulePanel);
       });
 
-      updateUsageUI();
-      await loadHistory();
-    } catch (error) {
-      console.error(error);
-      status.textContent = "Could not connect to the server.";
-    }
+      results.appendChild(section);
+    });
+
+    updateUsageUI();
+    await loadHistory();
+  } catch (error) {
+    console.error(error);
+    status.textContent = "Could not connect to the server.";
   }
+}
 
   function toggleSchedulePanel(index) {
     const panel = document.getElementById(`schedule-panel-${index}`);
