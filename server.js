@@ -343,8 +343,6 @@ const typeMap = {
   "weekend-special": "Weekend Special"
 };
 
-const typeLabel = typeMap[type] || "Promotion";
-
 const prompt = `
 You are a strong social media copywriter for bars, restaurants, nightlife venues, and local food spots.
 
@@ -436,7 +434,6 @@ const record = {
   clientId,
   promotionsCalendar,
   tone,
-  platform,
   status: "generated",
   scheduledFor: null,
   posts,
@@ -453,7 +450,6 @@ res.json({
   meta: {
     promotionsCalendar,
     tone,
-    type,
     generatedAt: record.createdAt
 }
     });
