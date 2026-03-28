@@ -449,8 +449,22 @@ res.json({
     tone,
     type,
     generatedAt: record.createdAt
-  }
+}
     });
+
+} catch (error) {
+  console.error("Generate error:", error);
+
+  const message =
+    error?.error?.message ||
+    error?.message ||
+    "Something went wrong on the server.";
+
+  res.status(500).json({
+    error: message
+  });
+}
+
 });
 
 app.get("/posts", async (req, res) => {
