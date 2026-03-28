@@ -691,13 +691,112 @@
        <div class="field full">
   <label>Build Your Promotions Calendar</label>
 
-  <input id="monday" placeholder="Monday (e.g. Margarita Monday)" />
-  <input id="tuesday" placeholder="Tuesday (e.g. Taco Tuesday)" />
-  <input id="wednesday" placeholder="Wednesday (e.g. Wing Night)" />
-  <input id="thursday" placeholder="Thursday (e.g. Trivia Night)" />
-  <input id="friday" placeholder="Friday (e.g. Live DJ)" />
-  <input id="saturday" placeholder="Saturday (e.g. DJ + Drink Specials)" />
-  <input id="sunday" placeholder="Sunday (e.g. Bloody Mary Bar)" />
+  <div class="schedule-grid">
+    <div class="field">
+      <label for="monday">Monday</label>
+      <input id="monday" placeholder="e.g. Margarita Monday" />
+    </div>
+    <div class="field">
+      <label for="mondayType">Monday Type</label>
+      <select id="mondayType">
+        <option value="drink">Drink Promo</option>
+        <option value="food">Food Special</option>
+        <option value="event">Event Promotion</option>
+        <option value="happy-hour">Happy Hour</option>
+        <option value="weekend-special">Weekend Special</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="tuesday">Tuesday</label>
+      <input id="tuesday" placeholder="e.g. Taco Tuesday" />
+    </div>
+    <div class="field">
+      <label for="tuesdayType">Tuesday Type</label>
+      <select id="tuesdayType">
+        <option value="drink">Drink Promo</option>
+        <option value="food">Food Special</option>
+        <option value="event">Event Promotion</option>
+        <option value="happy-hour">Happy Hour</option>
+        <option value="weekend-special">Weekend Special</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="wednesday">Wednesday</label>
+      <input id="wednesday" placeholder="e.g. Wing Night" />
+    </div>
+    <div class="field">
+      <label for="wednesdayType">Wednesday Type</label>
+      <select id="wednesdayType">
+        <option value="drink">Drink Promo</option>
+        <option value="food">Food Special</option>
+        <option value="event">Event Promotion</option>
+        <option value="happy-hour">Happy Hour</option>
+        <option value="weekend-special">Weekend Special</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="thursday">Thursday</label>
+      <input id="thursday" placeholder="e.g. Trivia Night" />
+    </div>
+    <div class="field">
+      <label for="thursdayType">Thursday Type</label>
+      <select id="thursdayType">
+        <option value="drink">Drink Promo</option>
+        <option value="food">Food Special</option>
+        <option value="event">Event Promotion</option>
+        <option value="happy-hour">Happy Hour</option>
+        <option value="weekend-special">Weekend Special</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="friday">Friday</label>
+      <input id="friday" placeholder="e.g. Live DJ" />
+    </div>
+    <div class="field">
+      <label for="fridayType">Friday Type</label>
+      <select id="fridayType">
+        <option value="drink">Drink Promo</option>
+        <option value="food">Food Special</option>
+        <option value="event">Event Promotion</option>
+        <option value="happy-hour">Happy Hour</option>
+        <option value="weekend-special">Weekend Special</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="saturday">Saturday</label>
+      <input id="saturday" placeholder="e.g. DJ + Drink Specials" />
+    </div>
+    <div class="field">
+      <label for="saturdayType">Saturday Type</label>
+      <select id="saturdayType">
+        <option value="drink">Drink Promo</option>
+        <option value="food">Food Special</option>
+        <option value="event">Event Promotion</option>
+        <option value="happy-hour">Happy Hour</option>
+        <option value="weekend-special">Weekend Special</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="sunday">Sunday</label>
+      <input id="sunday" placeholder="e.g. Bloody Mary Bar" />
+    </div>
+    <div class="field">
+      <label for="sundayType">Sunday Type</label>
+      <select id="sundayType">
+        <option value="drink">Drink Promo</option>
+        <option value="food">Food Special</option>
+        <option value="event">Event Promotion</option>
+        <option value="happy-hour">Happy Hour</option>
+        <option value="weekend-special">Weekend Special</option>
+      </select>
+    </div>
+  </div>
 </div>
 
           <div class="field">
@@ -958,33 +1057,50 @@ if (!clientId) {
 
 async function generatePosts() {
   const tone = document.getElementById("tone").value;
-  const type = document.getElementById("type").value;
-  const platform = document.getElementById("platform").value;
   const status = document.getElementById("status");
   const results = document.getElementById("results");
 
   const payload = {
-    monday: document.getElementById("monday").value.trim(),
-    tuesday: document.getElementById("tuesday").value.trim(),
-    wednesday: document.getElementById("wednesday").value.trim(),
-    thursday: document.getElementById("thursday").value.trim(),
-    friday: document.getElementById("friday").value.trim(),
-    saturday: document.getElementById("saturday").value.trim(),
-    sunday: document.getElementById("sunday").value.trim(),
+    monday: {
+      text: document.getElementById("monday").value.trim(),
+      type: document.getElementById("mondayType").value
+    },
+    tuesday: {
+      text: document.getElementById("tuesday").value.trim(),
+      type: document.getElementById("tuesdayType").value
+    },
+    wednesday: {
+      text: document.getElementById("wednesday").value.trim(),
+      type: document.getElementById("wednesdayType").value
+    },
+    thursday: {
+      text: document.getElementById("thursday").value.trim(),
+      type: document.getElementById("thursdayType").value
+    },
+    friday: {
+      text: document.getElementById("friday").value.trim(),
+      type: document.getElementById("fridayType").value
+    },
+    saturday: {
+      text: document.getElementById("saturday").value.trim(),
+      type: document.getElementById("saturdayType").value
+    },
+    sunday: {
+      text: document.getElementById("sunday").value.trim(),
+      type: document.getElementById("sundayType").value
+    },
     tone,
-    type,
-    platform,
     clientId
   };
 
   const hasInput = [
-    payload.monday,
-    payload.tuesday,
-    payload.wednesday,
-    payload.thursday,
-    payload.friday,
-    payload.saturday,
-    payload.sunday
+    payload.monday.text,
+    payload.tuesday.text,
+    payload.wednesday.text,
+    payload.thursday.text,
+    payload.friday.text,
+    payload.saturday.text,
+    payload.sunday.text
   ].some((value) => value.length > 1);
 
   if (!hasInput) {
@@ -1043,10 +1159,7 @@ async function generatePosts() {
 
     days.forEach((day) => {
       const dayPosts = data.posts?.[day];
-
-      if (!Array.isArray(dayPosts) || !dayPosts.length) {
-        return;
-      }
+      if (!Array.isArray(dayPosts) || !dayPosts.length) return;
 
       const section = document.createElement("div");
       section.className = "post-card";
@@ -1066,7 +1179,7 @@ async function generatePosts() {
       top.appendChild(postTag);
       section.appendChild(top);
 
-      dayPosts.forEach((post, index) => {
+      dayPosts.forEach((post) => {
         const text = document.createElement("p");
         text.className = "post-text";
         text.textContent = post;
@@ -1150,7 +1263,6 @@ async function generatePosts() {
     status.textContent = "Could not connect to the server.";
   }
 }
-
   function toggleSchedulePanel(index) {
     const panel = document.getElementById(`schedule-panel-${index}`);
     panel.style.display = panel.style.display === "block" ? "none" : "block";

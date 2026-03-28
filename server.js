@@ -80,8 +80,6 @@ async function savePostRecord(record) {
         client_id: record.clientId,
         promotions_calendar: record.promotionsCalendar,
         tone: record.tone,
-        type: record.type,
-        platform: record.platform,
         status: record.status,
         scheduled_for: record.scheduledFor,
         posts: record.posts,
@@ -99,7 +97,6 @@ async function savePostRecord(record) {
 
   return data;
 }
-
 async function incrementUsage(clientId) {
   const today = getTodayKey();
   const environment = process.env.APP_ENV || "prod";
@@ -277,21 +274,39 @@ if (!isDev && currentUsage >= DAILY_FREE_LIMIT) {
 }
 
 const tone = safeTrim(req.body?.tone, "professional").toLowerCase();
-const type = safeTrim(req.body?.type, "drink").toLowerCase();
-const platform = safeTrim(req.body?.platform).toLowerCase();
 
 const promotionsCalendar = {
-  monday: safeTrim(req.body?.monday),
-  tuesday: safeTrim(req.body?.tuesday),
-  wednesday: safeTrim(req.body?.wednesday),
-  thursday: safeTrim(req.body?.thursday),
-  friday: safeTrim(req.body?.friday),
-  saturday: safeTrim(req.body?.saturday),
-  sunday: safeTrim(req.body?.sunday)
+  monday: {
+    text: safeTrim(req.body?.monday?.text),
+    type: safeTrim(req.body?.monday?.type, "drink").toLowerCase()
+  },
+  tuesday: {
+    text: safeTrim(req.body?.tuesday?.text),
+    type: safeTrim(req.body?.tuesday?.type, "drink").toLowerCase()
+  },
+  wednesday: {
+    text: safeTrim(req.body?.wednesday?.text),
+    type: safeTrim(req.body?.wednesday?.type, "drink").toLowerCase()
+  },
+  thursday: {
+    text: safeTrim(req.body?.thursday?.text),
+    type: safeTrim(req.body?.thursday?.type, "drink").toLowerCase()
+  },
+  friday: {
+    text: safeTrim(req.body?.friday?.text),
+    type: safeTrim(req.body?.friday?.type, "drink").toLowerCase()
+  },
+  saturday: {
+    text: safeTrim(req.body?.saturday?.text),
+    type: safeTrim(req.body?.saturday?.type, "drink").toLowerCase()
+  },
+  sunday: {
+    text: safeTrim(req.body?.sunday?.text),
+    type: safeTrim(req.body?.sunday?.type, "drink").toLowerCase()
+  }
 };
-
 const hasAtLeastOneDay = Object.values(promotionsCalendar).some(
-  (value) => value && value.length >= 2
+  (entry) => entry.text && entry.text.length >= 2
 );
 
 if (!hasAtLeastOneDay) {
@@ -299,11 +314,16 @@ if (!hasAtLeastOneDay) {
     error: "At least one day in the promotions calendar is required."
   });
 }
-
-for (const [day, value] of Object.entries(promotionsCalendar)) {
-  if (value && value.length > 160) {
+for (const [day, entry] of Object.entries(promotionsCalendar)) {
+  if (entry.text && entry.text.length > 160) {
     return res.status(400).json({
       error: `${day} is too long. Keep each calendar entry under 160 characters.`
+    });
+  }
+
+  if (entry.text && !ALLOWED_TYPES.has(entry.type)) {
+    return res.status(400).json({
+      error: `Invalid content type selected for ${day}.`
     });
   }
 }
@@ -317,12 +337,6 @@ if (!ALLOWED_TONES.has(tone)) {
 if (!ALLOWED_TYPES.has(type)) {
   return res.status(400).json({
     error: "Invalid content type selected."
-  });
-}
-
-if (!ALLOWED_PLATFORMS.has(platform)) {
-  return res.status(400).json({
-    error: "Invalid platform selected."
   });
 }
 
