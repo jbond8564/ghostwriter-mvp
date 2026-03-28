@@ -332,12 +332,7 @@ if (!ALLOWED_TONES.has(tone)) {
   return res.status(400).json({
     error: "Invalid tone selected."
   });
-}
 
-if (!ALLOWED_TYPES.has(type)) {
-  return res.status(400).json({
-    error: "Invalid content type selected."
-  });
 }
 
 const typeMap = {
@@ -441,7 +436,6 @@ const record = {
   clientId,
   promotionsCalendar,
   tone,
-  type,
   platform,
   status: "generated",
   scheduledFor: null,
