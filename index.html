@@ -1052,14 +1052,14 @@
 
   days.forEach(day => grouped[day] = []);
 
-  items.forEach(item => {
-    const day = item.date
-      ? new Date(item.date).toLocaleDateString(undefined, { weekday: "long" })
-      : "Unscheduled";
+items.forEach(item => {
+  const day = item.date
+    ? new Date(`${item.date}T12:00:00`).toLocaleDateString(undefined, { weekday: "long" })
+    : "Unscheduled";
 
-    if (!grouped[day]) grouped[day] = [];
-    grouped[day].push(item);
-  });
+  if (!grouped[day]) grouped[day] = [];
+  grouped[day].push(item);
+});
 
   container.innerHTML = days.map(day => `
     <div class="planner-day">
@@ -1069,16 +1069,19 @@
         grouped[day].length
           ? grouped[day].map(item => `
               <div class="planner-card">
-                <div class="planner-meta">
-                  ${item.platform} • ${item.repeat}
-                </div>
-                <div class="planner-text">
-                  ${truncateText(item.postText, 180)}
-                </div>
-                <button class="copy-mini" onclick="copyText('${encodeURIComponent(item.postText)}')">
-                  Copy
-                </button>
-              </div>
+  <div class="planner-meta">
+    ${item.platform} • ${item.repeat}
+  </div>
+  <div class="small" style="margin-bottom: 8px;">
+    ${formatDateTime(item.date, item.time)}
+  </div>
+  <div class="planner-text">
+    ${truncateText(item.postText, 180)}
+  </div>
+  <button class="copy-mini" onclick="copyText('${encodeURIComponent(item.postText)}')">
+    Copy
+  </button>
+</div>
             `).join("")
           : `<div class="empty-state">No posts</div>`
       }
@@ -1086,35 +1089,43 @@
   `).join("");
 }
 
-function renderCalendar(posts) {
+function renderCalendar(calendar) {
   const container = document.getElementById("calendarView");
 
-  if (!posts || typeof posts !== "object") {
+  if (!calendar || typeof calendar !== "object") {
     container.innerHTML = `<div class="empty-state">No calendar available.</div>`;
     return;
   }
 
-  const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+  const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
-  container.innerHTML = days.map(day => {
-    const dayPosts = posts[day] || [];
+  const typeLabels = {
+    drink: "Drink Promo",
+    food: "Food Special",
+    event: "Event Promotion",
+    "happy-hour": "Happy Hour",
+    "weekend-special": "Weekend Special"
+  };
+
+  container.innerHTML = days.map((day) => {
+    const entry = calendar[day];
+
+    if (!entry || !entry.text) {
+      return `
+        <div class="planner-day">
+          <h4>${day.charAt(0).toUpperCase() + day.slice(1)}</h4>
+          <div class="empty-state">No promotion planned</div>
+        </div>
+      `;
+    }
 
     return `
       <div class="planner-day">
         <h4>${day.charAt(0).toUpperCase() + day.slice(1)}</h4>
-
-        ${
-          dayPosts.length
-            ? dayPosts.map(post => `
-                <div class="planner-card">
-                  <div class="planner-text">${post}</div>
-                  <button class="copy-mini" onclick="copyText('${encodeURIComponent(post)}')">
-                    Copy
-                  </button>
-                </div>
-              `).join("")
-            : `<div class="empty-state">No posts</div>`
-        }
+        <div class="planner-card">
+          <div class="planner-meta">${typeLabels[entry.type] || "Promotion"}</div>
+          <div class="planner-text">${entry.text}</div>
+        </div>
       </div>
     `;
   }).join("");
@@ -1245,7 +1256,7 @@ async function generatePosts() {
     latestPosts = Object.values(data.posts || {}).flat();
     status.textContent = "Posts generated.";
 
-    renderCalendar(data.posts);
+    renderCalendar(data.meta?.promotionsCalendar);
 
     const days = [
       "monday",
