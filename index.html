@@ -1007,6 +1007,7 @@
 
   function renderHistory(records) {
   const container = document.getElementById("historyList");
+  if (!container) return;
 
   if (!records || !records.length) {
     container.innerHTML = `<div class="empty-state">No generations yet.</div>`;
@@ -1155,7 +1156,7 @@ function renderCalendar(calendar) {
   }).join("");
 }
 
-  async function loadHistory() {
+ async function loadHistory() {
   try {
     const response = await fetch(`${API_BASE_URL}/posts?clientId=${encodeURIComponent(clientId)}`);
     const data = await response.json();
@@ -1164,15 +1165,13 @@ function renderCalendar(calendar) {
 
     const posts = data.posts || [];
 
-    renderHistory(posts);
+    const latestWithCalendar = posts.find((p) => p.promotions_calendar);
 
-   const latestWithCalendar = posts.find(p => p.promotions_calendar);
-
-if (latestWithCalendar) {
-  renderCalendar(latestWithCalendar.promotions_calendar);
-} else {
-  renderCalendar(null);
-}
+    if (latestWithCalendar) {
+      renderCalendar(latestWithCalendar.promotions_calendar);
+    } else {
+      renderCalendar(null);
+    }
   } catch (error) {
     console.error("History load error:", error);
   }
