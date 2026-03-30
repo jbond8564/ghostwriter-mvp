@@ -1166,11 +1166,13 @@ function renderCalendar(calendar) {
 
     renderHistory(posts);
 
-    if (posts.length && posts[0].promotions_calendar) {
-      renderCalendar(posts[0].promotions_calendar);
-    } else {
-      renderCalendar(null);
-    }
+   const latestWithCalendar = posts.find(p => p.promotions_calendar);
+
+if (latestWithCalendar) {
+  renderCalendar(latestWithCalendar.promotions_calendar);
+} else {
+  renderCalendar(null);
+}
   } catch (error) {
     console.error("History load error:", error);
   }
