@@ -1092,9 +1092,9 @@ items.forEach(item => {
     ${formatDateTime(item.date, item.time)}
   </div>
   <div class="planner-text">
-    ${truncateText(item.postText, 180)}
+    ${truncateText(item.post_text, 180)}
   </div>
-  <button class="copy-mini" onclick="copyText('${encodeURIComponent(item.postText)}')">
+  <button class="copy-mini" onclick="copyText('${encodeURIComponent(item.post_text)}')">
     Copy
   </button>
 </div>
@@ -1161,17 +1161,17 @@ function renderCalendar(calendar) {
   }
 
   async function loadScheduled() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/scheduled`);
-      const data = await response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/scheduled?clientId=${encodeURIComponent(clientId)}`);
+    const data = await response.json();
 
-      if (!response.ok) return;
+    if (!response.ok) return;
 
-      renderScheduled(data.scheduled || []);
-    } catch (error) {
-      console.error("Scheduled load error:", error);
-    }
+    renderScheduled(data.scheduled || []);
+  } catch (error) {
+    console.error("Scheduled load error:", error);
   }
+}
 
   let clientId = localStorage.getItem("inkova_client_id");
 
@@ -1433,12 +1433,13 @@ function copyText(encoded) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          postText: post,
-          platform,
-          date,
-          time,
-          repeat
-        })
+  clientId,
+  postText: post,
+  platform,
+  date,
+  time,
+  repeat
+})
       });
 
       const data = await response.json();

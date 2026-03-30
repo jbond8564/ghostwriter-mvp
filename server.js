@@ -45,7 +45,6 @@ const client = new OpenAI({
 });
 
 // In-memory MVP storage
-let scheduledDB = [];
 
 const DAILY_FREE_LIMIT = 3;
 
@@ -496,13 +495,20 @@ app.get("/posts", async (req, res) => {
   }
 });
 
-app.post("/schedule", (req, res) => {
+app.post("/schedule", async (req, res) => {
   try {
+    const clientId = safeTrim(req.body?.clientId);
     const postText = safeTrim(req.body?.postText);
     const platform = safeTrim(req.body?.platform);
     const date = safeTrim(req.body?.date);
     const time = safeTrim(req.body?.time);
     const repeat = safeTrim(req.body?.repeat, "One time");
+
+    if (!clientId) {
+      return res.status(400).json({
+        error: "Missing clientId."
+      });
+    }
 
     if (!postText) {
       return res.status(400).json({
@@ -524,20 +530,27 @@ app.post("/schedule", (req, res) => {
 
     const scheduled = {
       id: crypto.randomUUID(),
-      postText,
+      client_id: clientId,
+      post_text: postText,
       platform,
       date: date || null,
       time: time || null,
       repeat,
       status: "draft",
-      createdAt: new Date().toISOString()
+      created_at: new Date().toISOString()
     };
 
-    scheduledDB.unshift(scheduled);
+    const { data, error } = await supabase
+      .from("scheduled_posts")
+      .insert([scheduled])
+      .select()
+      .single();
+
+    if (error) throw error;
 
     res.json({
       success: true,
-      scheduled
+      scheduled: data
     });
   } catch (error) {
     console.error("Schedule error:", error);
@@ -548,10 +561,34 @@ app.post("/schedule", (req, res) => {
   }
 });
 
-app.get("/scheduled", (req, res) => {
-  res.json({
-    scheduled: scheduledDB.slice(0, 20)
-  });
+app.get("/scheduled", async (req, res) => {
+  try {
+    const clientId = safeTrim(req.query.clientId);
+
+    let query = supabase
+      .from("scheduled_posts")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (clientId) {
+      query = query.eq("client_id", clientId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    res.json({
+      scheduled: data || []
+    });
+  } catch (error) {
+    console.error("Fetch scheduled error:", error);
+
+    res.status(500).json({
+      error: "Failed to fetch scheduled posts."
+    });
+  }
 });
 
 app.post("/waitlist", async (req, res) => {
