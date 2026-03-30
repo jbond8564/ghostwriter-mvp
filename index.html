@@ -16,6 +16,51 @@
   <meta name="twitter:image" content="/social-preview-1200x630.png">
 
   <style>
+
+.planner-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.planner-day {
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(10, 18, 34, 0.8);
+}
+
+.planner-day h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--muted-2);
+}
+
+.planner-card {
+  background: rgba(9, 17, 31, 0.95);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.planner-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.planner-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.copy-mini {
+  margin-top: 8px;
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
     * {
       box-sizing: border-box;
     }
@@ -823,31 +868,38 @@
       </div>
     </div>
 
-    <div class="right-column">
-      <div class="panel">
-        <h3>Your Workspace</h3>
-        <p class="panel-subtitle">
-          Your recent activity and saved drafts.
-        </p>
+   <div class="right-column">
 
-        <div class="list-box">
-          <div class="small">Recent drafts</div>
-          <div id="scheduledList" class="sidebar-list">
-            <div class="empty-state">No promotions this week.</div>
-          </div>
-        </div>
+  <!-- WEEKLY PLANNER -->
+  <div class="panel">
+    <h3>Weekly Planner</h3>
+    <p class="panel-subtitle">
+      Your scheduled content organized by day.
+    </p>
 
-        <div class="list-box">
-          <div class="small">Recent generations</div>
-          <div id="historyList" class="sidebar-list">
-            <div class="empty-state">No generations yet.</div>
-          </div>
-        </div>
-<div class="button-row">
-  <button class="ghost-btn" onclick="reportBug()">Report a Bug</button>
-  <button class="ghost-btn" onclick="suggestFeature()">💡 Suggest Feature</button>
-</div> 
+    <div id="plannerView" class="planner-view">
+      <div class="empty-state">No posts scheduled yet.</div>
+    </div>
   </div>
+
+  <!-- PROMOTIONS CALENDAR -->
+  <div class="panel">
+    <h3>Current Promotions Calendar</h3>
+    <p class="panel-subtitle">
+      Your latest generated weekly promotions.
+    </p>
+
+    <div id="calendarView" class="planner-view">
+      <div class="empty-state">Generate content to see your calendar.</div>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button class="ghost-btn" onclick="reportBug()">Report a Bug</button>
+    <button class="ghost-btn" onclick="suggestFeature()">💡 Suggest Feature</button>
+  </div>
+
+</div>
 </main>
 
 <div id="paywallModal" class="paywall-modal hidden">
@@ -874,7 +926,7 @@
 </div>
 
   <script>
-  const API_BASE_URL = "https://ghostwriter-backend-xx4m.onrender.com";
+  const API_BASE_URL = "https://inkova-backend-dev.onrender.com";
   const DAILY_FREE_LIMIT = 3;
 
   let latestPosts = [];
@@ -986,30 +1038,87 @@
     .join("");
 }
 
-  function renderScheduled(items) {
-    const container = document.getElementById("scheduledList");
+ function renderScheduled(items) {
+  const container = document.getElementById("plannerView");
 
-    if (!items || !items.length) {
-      container.innerHTML = `<div class="empty-state">No drafts saved yet.</div>`;
-      return;
-    }
+  const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 
-    container.innerHTML = items
-      .slice(0, 5)
-      .map((item) => {
-        return `
-          <div class="list-item">
-            <div class="list-item-top">
-              <div class="list-item-title">${item.platform || "Platform"} • ${item.repeat || "One time"}</div>
-              <span class="status-pill">${item.status || "Saved to drafts"}</span>
-            </div>
-            <p class="list-item-text">${truncateText(item.postText)}</p>
-            <div class="small" style="margin-top: 8px;">${formatDateTime(item.date, item.time)}</div>
-          </div>
-        `;
-      })
-      .join("");
+  if (!items || !items.length) {
+    container.innerHTML = `<div class="empty-state">No posts scheduled yet.</div>`;
+    return;
   }
+
+  const grouped = {};
+
+  days.forEach(day => grouped[day] = []);
+
+  items.forEach(item => {
+    const day = item.date
+      ? new Date(item.date).toLocaleDateString(undefined, { weekday: "long" })
+      : "Unscheduled";
+
+    if (!grouped[day]) grouped[day] = [];
+    grouped[day].push(item);
+  });
+
+  container.innerHTML = days.map(day => `
+    <div class="planner-day">
+      <h4>${day}</h4>
+
+      ${
+        grouped[day].length
+          ? grouped[day].map(item => `
+              <div class="planner-card">
+                <div class="planner-meta">
+                  ${item.platform} • ${item.repeat}
+                </div>
+                <div class="planner-text">
+                  ${truncateText(item.postText, 180)}
+                </div>
+                <button class="copy-mini" onclick="copyText('${encodeURIComponent(item.postText)}')">
+                  Copy
+                </button>
+              </div>
+            `).join("")
+          : `<div class="empty-state">No posts</div>`
+      }
+    </div>
+  `).join("");
+}
+
+function renderCalendar(posts) {
+  const container = document.getElementById("calendarView");
+
+  if (!posts || typeof posts !== "object") {
+    container.innerHTML = `<div class="empty-state">No calendar available.</div>`;
+    return;
+  }
+
+  const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+
+  container.innerHTML = days.map(day => {
+    const dayPosts = posts[day] || [];
+
+    return `
+      <div class="planner-day">
+        <h4>${day.charAt(0).toUpperCase() + day.slice(1)}</h4>
+
+        ${
+          dayPosts.length
+            ? dayPosts.map(post => `
+                <div class="planner-card">
+                  <div class="planner-text">${post}</div>
+                  <button class="copy-mini" onclick="copyText('${encodeURIComponent(post)}')">
+                    Copy
+                  </button>
+                </div>
+              `).join("")
+            : `<div class="empty-state">No posts</div>`
+        }
+      </div>
+    `;
+  }).join("");
+}
 
   async function loadHistory() {
     try {
@@ -1136,6 +1245,8 @@ async function generatePosts() {
     latestPosts = Object.values(data.posts || {}).flat();
     status.textContent = "Posts generated.";
 
+    renderCalendar(data.posts);
+
     const days = [
       "monday",
       "tuesday",
@@ -1260,6 +1371,18 @@ async function generatePosts() {
   function hideSchedulePanel(index) {
     document.getElementById(`schedule-panel-${index}`).style.display = "none";
   }
+
+function copyText(encoded) {
+  const text = decodeURIComponent(encoded);
+
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      document.getElementById("status").textContent = "Copied.";
+    })
+    .catch(() => {
+      document.getElementById("status").textContent = "Copy failed.";
+    });
+}
 
   async function realSchedule(index) {
     const post = latestPosts[index];
