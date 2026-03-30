@@ -1113,7 +1113,15 @@ function renderCalendar(calendar) {
     return;
   }
 
-  const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+  const days = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday"
+  ];
 
   const typeLabels = {
     drink: "Drink Promo",
@@ -1148,17 +1156,25 @@ function renderCalendar(calendar) {
 }
 
   async function loadHistory() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/posts?clientId=${encodeURIComponent(clientId)}`);
-      const data = await response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts?clientId=${encodeURIComponent(clientId)}`);
+    const data = await response.json();
 
-      if (!response.ok) return;
+    if (!response.ok) return;
 
-      renderHistory(data.posts || []);
-    } catch (error) {
-      console.error("History load error:", error);
+    const posts = data.posts || [];
+
+    renderHistory(posts);
+
+    if (posts.length && posts[0].promotions_calendar) {
+      renderCalendar(posts[0].promotions_calendar);
+    } else {
+      renderCalendar(null);
     }
+  } catch (error) {
+    console.error("History load error:", error);
   }
+}
 
   async function loadScheduled() {
   try {
