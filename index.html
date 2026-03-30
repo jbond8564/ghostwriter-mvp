@@ -360,10 +360,18 @@
   margin-top: 10px;
 }
 
-.button-row .ghost-btn {
-  flex: 1; /* makes them equal width */
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
 }
-    .field {
+
+.button-row .primary-btn,
+.button-row .ghost-btn {
+  flex: 0 0 auto;
+  min-width: 120px;
+}    .field {
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -984,10 +992,18 @@
   }
 
   function formatDateTime(date, time) {
-    if (!date && !time) return "Not specified";
-    if (date && time) return `${date} at ${time}`;
-    return date || time;
+  if (!date && !time) return "Not specified";
+
+  let formattedDate = "";
+
+  if (date) {
+    const [year, month, day] = date.split("-");
+    formattedDate = `${month}-${day}-${year}`;
   }
+
+  if (formattedDate && time) return `${formattedDate} at ${time}`;
+  return formattedDate || time;
+}
 
   function renderHistory(records) {
   const container = document.getElementById("historyList");
