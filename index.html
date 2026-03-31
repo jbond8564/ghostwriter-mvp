@@ -16,6 +16,97 @@
   <meta name="twitter:image" content="/social-preview-1200x630.png">
 
   <style>
+
+.platform-multi {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.platform-badge {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.platform-badge.instagram { background: #1c2b45; }
+.platform-badge.facebook { background: #1b3a5c; }
+.platform-badge.tiktok { background: #2a2a2a; }
+.platform-badge.x { background: #333; }
+
+.platform-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a1322;
+  border: 1px solid #2d3d58;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.platform-option input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.planner-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.planner-day {
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(10, 18, 34, 0.8);
+}
+
+.planner-day h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--muted-2);
+}
+
+.planner-card {
+  background: rgba(9, 17, 31, 0.95);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.planner-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.planner-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.planner-text {
+  max-height: 60px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.planner-card.expanded .planner-text {
+  max-height: 500px;
+}
+
+.copy-mini {
+  margin-top: 8px;
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
     * {
       box-sizing: border-box;
     }
@@ -315,10 +406,18 @@
   margin-top: 10px;
 }
 
-.button-row .ghost-btn {
-  flex: 1; /* makes them equal width */
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
 }
-    .field {
+
+.button-row .primary-btn,
+.button-row .ghost-btn {
+  flex: 0 0 auto;
+  min-width: 120px;
+}    .field {
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -823,31 +922,38 @@
       </div>
     </div>
 
-    <div class="right-column">
-      <div class="panel">
-        <h3>Your Workspace</h3>
-        <p class="panel-subtitle">
-          Your recent activity and saved drafts.
-        </p>
+   <div class="right-column">
 
-        <div class="list-box">
-          <div class="small">Recent drafts</div>
-          <div id="scheduledList" class="sidebar-list">
-            <div class="empty-state">No promotions this week.</div>
-          </div>
-        </div>
+  <!-- WEEKLY PLANNER -->
+  <div class="panel">
+    <h3>Weekly Planner</h3>
+    <p class="panel-subtitle">
+      Your scheduled content organized by day.
+    </p>
 
-        <div class="list-box">
-          <div class="small">Recent generations</div>
-          <div id="historyList" class="sidebar-list">
-            <div class="empty-state">No generations yet.</div>
-          </div>
-        </div>
-<div class="button-row">
-  <button class="ghost-btn" onclick="reportBug()">Report a Bug</button>
-  <button class="ghost-btn" onclick="suggestFeature()">💡 Suggest Feature</button>
-</div> 
+    <div id="plannerView" class="planner-view">
+      <div class="empty-state">No posts scheduled yet.</div>
+    </div>
   </div>
+
+  <!-- PROMOTIONS CALENDAR -->
+  <div class="panel">
+    <h3>Current Promotions Calendar</h3>
+    <p class="panel-subtitle">
+      Your latest generated weekly promotions.
+    </p>
+
+    <div id="calendarView" class="planner-view">
+      <div class="empty-state">Generate content to see your calendar.</div>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button class="ghost-btn" onclick="reportBug()">Report a Bug</button>
+    <button class="ghost-btn" onclick="suggestFeature()">💡 Suggest Feature</button>
+  </div>
+
+</div>
 </main>
 
 <div id="paywallModal" class="paywall-modal hidden">
@@ -932,13 +1038,26 @@
   }
 
   function formatDateTime(date, time) {
-    if (!date && !time) return "Not specified";
-    if (date && time) return `${date} at ${time}`;
-    return date || time;
+  if (!date && !time) return "Not specified";
+
+  let formattedDate = "";
+
+  if (date) {
+    const [year, month, day] = date.split("-");
+    formattedDate = `${month}-${day}-${year}`;
   }
+
+  if (formattedDate && time) return `${formattedDate} at ${time}`;
+  return formattedDate || time;
+}
+
+function toggleExpand(el) {
+  el.classList.toggle("expanded");
+}
 
   function renderHistory(records) {
   const container = document.getElementById("historyList");
+  if (!container) return;
 
   if (!records || !records.length) {
     container.innerHTML = `<div class="empty-state">No generations yet.</div>`;
@@ -986,56 +1105,149 @@
     .join("");
 }
 
-  function renderScheduled(items) {
-    const container = document.getElementById("scheduledList");
+ function renderScheduled(items) {
+  const container = document.getElementById("plannerView");
 
-    if (!items || !items.length) {
-      container.innerHTML = `<div class="empty-state">No drafts saved yet.</div>`;
-      return;
-    }
+  const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 
-    container.innerHTML = items
-      .slice(0, 5)
-      .map((item) => {
-        return `
-          <div class="list-item">
-            <div class="list-item-top">
-              <div class="list-item-title">${item.platform || "Platform"} • ${item.repeat || "One time"}</div>
-              <span class="status-pill">${item.status || "Saved to drafts"}</span>
-            </div>
-            <p class="list-item-text">${truncateText(item.postText)}</p>
-            <div class="small" style="margin-top: 8px;">${formatDateTime(item.date, item.time)}</div>
-          </div>
-        `;
-      })
-      .join("");
+  if (!items || !items.length) {
+    container.innerHTML = `<div class="empty-state">No posts scheduled yet.</div>`;
+    return;
   }
 
-  async function loadHistory() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/posts?clientId=${encodeURIComponent(clientId)}`);
-      const data = await response.json();
+items.sort((a, b) => {
+  const aDate = new Date(`${a.date || ""}T${a.time || "00:00"}`);
+  const bDate = new Date(`${b.date || ""}T${b.time || "00:00"}`);
+  return aDate - bDate;
+});
 
-      if (!response.ok) return;
+  const grouped = {};
 
-      renderHistory(data.posts || []);
-    } catch (error) {
-      console.error("History load error:", error);
-    }
+  days.forEach(day => grouped[day] = []);
+
+items.forEach(item => {
+  const day = item.date
+    ? new Date(`${item.date}T12:00:00`).toLocaleDateString(undefined, { weekday: "long" })
+    : "Unscheduled";
+
+  if (!grouped[day]) grouped[day] = [];
+  grouped[day].push(item);
+});
+
+  container.innerHTML = days.map(day => `
+    <div class="planner-day">
+      <h4>${day}</h4>
+
+      ${
+        grouped[day].length
+          ? grouped[day].map(item => `
+              <div class="planner-card" onclick="toggleExpand(this)">
+  <div class="planner-meta">
+   <span class="platform-badge ${item.platform}">
+  ${item.platform}• ${item.repeat}
+
+</span> 
+  </div>
+  <div class="small" style="margin-bottom: 8px;">
+    ${formatDateTime(item.date, item.time)}
+  </div>
+  <div class="planner-text">
+    ${truncateText(item.post_text, 180)}
+  </div>
+  <button class="copy-mini" onclick="copyText('${encodeURIComponent(item.post_text)}')">
+    Copy
+  </button>
+</div>
+            `).join("")
+          : `<div class="empty-state">No posts</div>`
+      }
+    </div>
+  `).join("");
+}
+
+function renderCalendar(calendar) {
+  const container = document.getElementById("calendarView");
+
+  if (!calendar || typeof calendar !== "object") {
+    container.innerHTML = `<div class="empty-state">No calendar available.</div>`;
+    return;
   }
+
+  const days = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday"
+  ];
+
+  const typeLabels = {
+    drink: "Drink Promo",
+    food: "Food Special",
+    event: "Event Promotion",
+    "happy-hour": "Happy Hour",
+    "weekend-special": "Weekend Special"
+  };
+
+  container.innerHTML = days.map((day) => {
+    const entry = calendar[day];
+
+    if (!entry || !entry.text) {
+      return `
+        <div class="planner-day">
+          <h4>${day.charAt(0).toUpperCase() + day.slice(1)}</h4>
+          <div class="empty-state">No promotion planned</div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="planner-day">
+        <h4>${day.charAt(0).toUpperCase() + day.slice(1)}</h4>
+        <div class="planner-card">
+          <div class="planner-meta">${typeLabels[entry.type] || "Promotion"}</div>
+          <div class="planner-text">${entry.text}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+ async function loadHistory() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts?clientId=${encodeURIComponent(clientId)}`);
+    const data = await response.json();
+
+    if (!response.ok) return;
+
+    const posts = data.posts || [];
+
+    const latestWithCalendar = posts.find((p) => p.promotions_calendar);
+
+    if (latestWithCalendar) {
+      renderCalendar(latestWithCalendar.promotions_calendar);
+    } else {
+      renderCalendar(null);
+    }
+  } catch (error) {
+    console.error("History load error:", error);
+  }
+}
 
   async function loadScheduled() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/scheduled`);
-      const data = await response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/scheduled?clientId=${encodeURIComponent(clientId)}`);
+    const data = await response.json();
 
-      if (!response.ok) return;
+    if (!response.ok) return;
 
-      renderScheduled(data.scheduled || []);
-    } catch (error) {
-      console.error("Scheduled load error:", error);
-    }
+    renderScheduled(data.scheduled || []);
+  } catch (error) {
+    console.error("Scheduled load error:", error);
   }
+}
 
   let clientId = localStorage.getItem("inkova_client_id");
 
@@ -1136,6 +1348,8 @@ async function generatePosts() {
     latestPosts = Object.values(data.posts || {}).flat();
     status.textContent = "Posts generated.";
 
+    renderCalendar(data.meta?.promotionsCalendar);
+
     const days = [
       "monday",
       "tuesday",
@@ -1207,13 +1421,26 @@ async function generatePosts() {
           <div class="schedule-title">Save this post as a draft</div>
           <div class="schedule-grid">
             <div class="field">
-              <label>Channel</label>
-              <select id="platform-${flatIndex}">
-                <option value="instagram">Instagram</option>
-                <option value="facebook">Facebook</option>
-                <option value="tiktok">TikTok</option>
-                <option value="x">X</option>
-              </select>
+  <label>Platforms</label>
+  <div class="platform-multi">
+    <label class="platform-option">
+      <input type="checkbox" id="platform-instagram-${flatIndex}" value="instagram" />
+      <span>Instagram</span>
+    </label>
+    <label class="platform-option">
+      <input type="checkbox" id="platform-facebook-${flatIndex}" value="facebook" />
+      <span>Facebook</span>
+    </label>
+    <label class="platform-option">
+      <input type="checkbox" id="platform-tiktok-${flatIndex}" value="tiktok" />
+      <span>TikTok</span>
+    </label>
+    <label class="platform-option">
+      <input type="checkbox" id="platform-x-${flatIndex}" value="x" />
+      <span>X</span>
+    </label>
+  </div>
+</div>
             </div>
             <div class="field">
               <label>Repeat</label>
@@ -1261,9 +1488,26 @@ async function generatePosts() {
     document.getElementById(`schedule-panel-${index}`).style.display = "none";
   }
 
+function copyText(encoded) {
+  const text = decodeURIComponent(encoded);
+
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      document.getElementById("status").textContent = "Copied.";
+    })
+    .catch(() => {
+      document.getElementById("status").textContent = "Copy failed.";
+    });
+}
+
   async function realSchedule(index) {
     const post = latestPosts[index];
-    const platform = document.getElementById(`platform-${index}`).value;
+    const selectedPlatforms = [
+  document.getElementById(`platform-instagram-${index}`)?.checked ? "instagram" : null,
+  document.getElementById(`platform-facebook-${index}`)?.checked ? "facebook" : null,
+  document.getElementById(`platform-tiktok-${index}`)?.checked ? "tiktok" : null,
+  document.getElementById(`platform-x-${index}`)?.checked ? "x" : null
+].filter(Boolean);
     const repeat = document.getElementById(`repeat-${index}`).value;
     const date = document.getElementById(`date-${index}`).value;
     const time = document.getElementById(`time-${index}`).value;
@@ -1274,6 +1518,11 @@ async function generatePosts() {
       return;
     }
 
+if (!selectedPlatforms.length) {
+  msg.textContent = "Select at least one platform.";
+  return;
+}
+
     msg.textContent = "Saving draft...";
 
     try {
@@ -1283,12 +1532,13 @@ async function generatePosts() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          postText: post,
-          platform,
-          date,
-          time,
-          repeat
-        })
+  clientId,
+  postText: post,
+  platforms: selectedPlatforms,
+  date,
+  time,
+  repeat
+})
       });
 
       const data = await response.json();
@@ -1298,7 +1548,7 @@ async function generatePosts() {
         return;
       }
 
-      msg.textContent = `Draft saved for ${platform}.`;
+      msg.textContent = `Saved ${selectedPlatforms.join(", ")}.`;
       hideSchedulePanel(index);
       await loadScheduled();
     } catch (error) {
