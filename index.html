@@ -17,6 +17,30 @@
 
   <style>
 
+.platform-multi {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.platform-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a1322;
+  border: 1px solid #2d3d58;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.platform-option input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
 .planner-view {
   display: flex;
   flex-direction: column;
@@ -1362,13 +1386,26 @@ async function generatePosts() {
           <div class="schedule-title">Save this post as a draft</div>
           <div class="schedule-grid">
             <div class="field">
-              <label>Channel</label>
-              <select id="platform-${flatIndex}">
-                <option value="instagram">Instagram</option>
-                <option value="facebook">Facebook</option>
-                <option value="tiktok">TikTok</option>
-                <option value="x">X</option>
-              </select>
+  <label>Platforms</label>
+  <div class="platform-multi">
+    <label class="platform-option">
+      <input type="checkbox" id="platform-instagram-${flatIndex}" value="instagram" />
+      <span>Instagram</span>
+    </label>
+    <label class="platform-option">
+      <input type="checkbox" id="platform-facebook-${flatIndex}" value="facebook" />
+      <span>Facebook</span>
+    </label>
+    <label class="platform-option">
+      <input type="checkbox" id="platform-tiktok-${flatIndex}" value="tiktok" />
+      <span>TikTok</span>
+    </label>
+    <label class="platform-option">
+      <input type="checkbox" id="platform-x-${flatIndex}" value="x" />
+      <span>X</span>
+    </label>
+  </div>
+</div>
             </div>
             <div class="field">
               <label>Repeat</label>
@@ -1430,7 +1467,12 @@ function copyText(encoded) {
 
   async function realSchedule(index) {
     const post = latestPosts[index];
-    const platform = document.getElementById(`platform-${index}`).value;
+    const selectedPlatforms = [
+  document.getElementById(`platform-instagram-${index}`)?.checked ? "instagram" : null,
+  document.getElementById(`platform-facebook-${index}`)?.checked ? "facebook" : null,
+  document.getElementById(`platform-tiktok-${index}`)?.checked ? "tiktok" : null,
+  document.getElementById(`platform-x-${index}`)?.checked ? "x" : null
+].filter(Boolean);
     const repeat = document.getElementById(`repeat-${index}`).value;
     const date = document.getElementById(`date-${index}`).value;
     const time = document.getElementById(`time-${index}`).value;
@@ -1440,6 +1482,11 @@ function copyText(encoded) {
       msg.textContent = "No post found to draft.";
       return;
     }
+
+if (!selectedPlatforms.length) {
+  msg.textContent = "Select at least one platform.";
+  return;
+}
 
     msg.textContent = "Saving draft...";
 
@@ -1452,7 +1499,7 @@ function copyText(encoded) {
         body: JSON.stringify({
   clientId,
   postText: post,
-  platform,
+  platforms: selectedPlatforms,
   date,
   time,
   repeat
@@ -1466,7 +1513,7 @@ function copyText(encoded) {
         return;
       }
 
-      msg.textContent = `Draft saved for ${platform}.`;
+      msg.textContent = `Draft saved for ${selectedPlatforms.join(", ")}.`;
       hideSchedulePanel(index);
       await loadScheduled();
     } catch (error) {
