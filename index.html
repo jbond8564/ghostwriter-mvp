@@ -23,6 +23,18 @@
   gap: 8px;
 }
 
+.platform-badge {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.platform-badge.instagram { background: #1c2b45; }
+.platform-badge.facebook { background: #1b3a5c; }
+.platform-badge.tiktok { background: #2a2a2a; }
+.platform-badge.x { background: #333; }
+
 .platform-option {
   display: flex;
   align-items: center;
@@ -77,6 +89,16 @@
 .planner-text {
   font-size: 14px;
   line-height: 1.5;
+}
+
+.planner-text {
+  max-height: 60px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.planner-card.expanded .planner-text {
+  max-height: 500px;
 }
 
 .copy-mini {
@@ -1029,6 +1051,10 @@
   return formattedDate || time;
 }
 
+function toggleExpand(el) {
+  el.classList.toggle("expanded");
+}
+
   function renderHistory(records) {
   const container = document.getElementById("historyList");
   if (!container) return;
@@ -1089,6 +1115,12 @@
     return;
   }
 
+items.sort((a, b) => {
+  const aDate = new Date(`${a.date || ""}T${a.time || "00:00"}`);
+  const bDate = new Date(`${b.date || ""}T${b.time || "00:00"}`);
+  return aDate - bDate;
+});
+
   const grouped = {};
 
   days.forEach(day => grouped[day] = []);
@@ -1109,9 +1141,12 @@ items.forEach(item => {
       ${
         grouped[day].length
           ? grouped[day].map(item => `
-              <div class="planner-card">
+              <div class="planner-card" onclick="toggleExpand(this)">
   <div class="planner-meta">
-    ${item.platform} • ${item.repeat}
+   <span class="platform-badge ${item.platform}">
+  ${item.platform}• ${item.repeat}
+
+</span> 
   </div>
   <div class="small" style="margin-bottom: 8px;">
     ${formatDateTime(item.date, item.time)}
@@ -1513,7 +1548,7 @@ if (!selectedPlatforms.length) {
         return;
       }
 
-      msg.textContent = `Draft saved for ${selectedPlatforms.join(", ")}.`;
+      msg.textContent = `Saved ${selectedPlatforms.join(", ")}.`;
       hideSchedulePanel(index);
       await loadScheduled();
     } catch (error) {
