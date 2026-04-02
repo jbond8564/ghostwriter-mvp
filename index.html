@@ -89,16 +89,13 @@
 .planner-text {
   font-size: 14px;
   line-height: 1.5;
-}
-
-.planner-text {
   max-height: 60px;
   overflow: hidden;
   transition: all 0.2s ease;
 }
-
 .planner-card.expanded .planner-text {
   max-height: 500px;
+  overflow: visible;
 }
 
 .copy-mini {
@@ -341,6 +338,54 @@
       max-width: 720px;
     }
 
+.hero-example {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--muted-2);
+  line-height: 1.6;
+  background: rgba(9, 17, 31, 0.7);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: inline-block;
+}
+
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.collapse-toggle {
+  background: rgba(20, 32, 54, 0.8);
+  border: 1px solid var(--border-soft);
+  color: var(--muted-2);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collapse-toggle:hover {
+  background: rgba(30, 45, 70, 0.9);
+  border-color: #415578;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.collapsible-content {
+  transition: all 0.2s ease;
+}
+
+.collapsible-content.collapsed {
+  display: none;
+}
+
     .badge {
       background: rgba(219, 234, 254, 0.96);
       color: #0f172a;
@@ -351,13 +396,7 @@
       letter-spacing: 0.03em;
     }
 
-   .content-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  align-items: start;
-}
-
+  
 .left-column {
   display: flex;
   flex-direction: column;
@@ -402,17 +441,16 @@
     }
 .button-row {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.button-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
   align-items: center;
 }
 
+.button-row .primary-btn,
+.button-row .ghost-btn {
+  min-width: 120px;
+}
 .button-row .primary-btn,
 .button-row .ghost-btn {
   flex: 0 0 auto;
@@ -743,40 +781,50 @@
     <h1>Inkova</h1>
     <p>Create. Schedule. Grow your content.</p>
     <div class="panel">
-        <h3>Plan &amp; Usage</h3>
-        <p class="panel-subtitle">
-          Your current plan and daily usage.
-        </p>
+  <div class="collapsible-header">
+    <div>
+      <h3>Plan &amp; Usage</h3>
+      <p class="panel-subtitle">Your current plan and daily usage.</p>
+    </div>
+    <button class="collapse-toggle" onclick="toggleSection('usageSection', this)">Show</button>
+  </div>
 
-        <div class="usage-box">
-          <div class="small">Free usage remaining today</div>
-          <div id="usageNumber" class="usage-number">3</div>
-          <div id="usageText" class="muted">3 posts remaining today</div>
-        </div>
+  <div id="usageSection" class="collapsible-content collapsed">
+    <div class="usage-box">
+      <div class="small">Free usage remaining today</div>
+      <div id="usageNumber" class="usage-number">3</div>
+      <div id="usageText" class="muted">3 posts remaining today</div>
+    </div>
 
-        <div class="plan-box">
-          <div class="small">Current plan</div>
-          <div style="font-size: 22px; font-weight: 800; margin-top: 8px;">Free</div>
-          <div class="muted" style="margin-top: 8px;">
-            Generate content, save draft schedules, and validate what works before live posting is enabled.
-          </div>
-        </div>
-
-        <div class="banner" id="connectMessage" style="margin-top: 16px;">
-          Connected channels are coming soon.
-        </div>
+    <div class="plan-box">
+      <div class="small">Current plan</div>
+      <div style="font-size: 22px; font-weight: 800; margin-top: 8px;">Free</div>
+      <div class="muted" style="margin-top: 8px;">
+        Generate content, save draft schedules, and validate what works before live posting is enabled.
       </div>
+    </div>
 
+    <div class="banner" id="connectMessage" style="margin-top: 16px;">
+      Connected channels are coming soon.
+    </div>
+  </div>
+</div>
   </div>
 </aside>
 
 <main class="main">
   <div class="topbar">
-    <div>
-      <h2>Inkova Social</h2>
-      <p>Create. Schedule. Grow your content.</p>
+  <div>
+    <h2>Plan a full week of bar and restaurant content in minutes</h2>
+    <p>
+      Turn your specials, events, and weekly promos into ready-to-post captions,
+      organize them in a planner, and save them by platform without rewriting everything by hand.
+    </p>
+    <div class="hero-example">
+      Monday: Margarita Monday • Tuesday: Taco Tuesday • Thursday: Trivia Night
     </div>
   </div>
+</div>
 
   <div class="content-grid">
     <div class="left-column">
@@ -926,27 +974,37 @@
 
   <!-- WEEKLY PLANNER -->
   <div class="panel">
-    <h3>Weekly Planner</h3>
-    <p class="panel-subtitle">
-      Your scheduled content organized by day.
-    </p>
+  <div class="collapsible-header">
+    <div>
+      <h3>Weekly Planner</h3>
+      <p class="panel-subtitle">Your scheduled content organized by day.</p>
+    </div>
+    <button class="collapse-toggle" onclick="toggleSection('plannerSection', this)">Show</button>
+  </div>
 
+  <div id="plannerSection" class="collapsible-content collapsed">
     <div id="plannerView" class="planner-view">
       <div class="empty-state">No posts scheduled yet.</div>
     </div>
   </div>
+</div>
 
   <!-- PROMOTIONS CALENDAR -->
   <div class="panel">
-    <h3>Current Promotions Calendar</h3>
-    <p class="panel-subtitle">
-      Your latest generated weekly promotions.
-    </p>
+  <div class="collapsible-header">
+    <div>
+      <h3>Current Promotions Calendar</h3>
+      <p class="panel-subtitle">Your latest generated weekly promotions.</p>
+    </div>
+    <button class="collapse-toggle" onclick="toggleSection('calendarSection', this)">Show</button>
+  </div>
 
+  <div id="calendarSection" class="collapsible-content collapsed">
     <div id="calendarView" class="planner-view">
       <div class="empty-state">Generate content to see your calendar.</div>
     </div>
   </div>
+</div>
 
   <div class="button-row">
     <button class="ghost-btn" onclick="reportBug()">Report a Bug</button>
@@ -980,7 +1038,7 @@
 </div>
 
   <script>
-  const API_BASE_URL = "https://ghostwriter-backend-xx4m.onrender.com";
+  const API_BASE_URL = "https://inkova-backend-dev.onrender.com";
   const DAILY_FREE_LIMIT = 3;
 
   let latestPosts = [];
@@ -1699,6 +1757,29 @@ ${navigator.userAgent}
     alert("Could not submit bug report. Try again.");
   }
 }
+
+function toggleSection(id, button) {
+  const section = document.getElementById(id);
+  if (!section) return;
+
+  const isCollapsed = section.classList.toggle("collapsed");
+
+  if (button) {
+    button.textContent = isCollapsed ? "Show" : "Hide";
+  }
+}
+
+function setupMobileCollapsedSections() {
+  if (window.innerWidth <= 700) {
+    const usageSection = document.getElementById("usageSection");
+    if (usageSection && !usageSection.classList.contains("collapsed")) {
+      usageSection.classList.add("collapsed");
+    }
+  }
+}
+
+setupMobileCollapsedSections();
+
 </script>
 </body>
 </html>
