@@ -362,15 +362,13 @@
   margin-bottom: 12px;
 }
 
-.collapse-toggle {
+..collapse-toggle {
   border: 1px solid var(--border);
   background: #121e31;
   color: var(--text);
   border-radius: 10px;
-  width: 32px;
-  height: 32px;
-  font-size: 18px;
-  line-height: 1;
+  padding: 6px 12px;
+  font-size: 12px;
   cursor: pointer;
 }
 
@@ -785,10 +783,10 @@
       <h3>Plan &amp; Usage</h3>
       <p class="panel-subtitle">Your current plan and daily usage.</p>
     </div>
-    <button class="collapse-toggle" onclick="toggleSection('usageSection', this)">−</button>
+    <button class="collapse-toggle" onclick="toggleSection('usageSection', this)">Show</button>
   </div>
 
-  <div id="usageSection" class="collapsible-content">
+  <div id="usageSection" class="collapsible-content collapsed">
     <div class="usage-box">
       <div class="small">Free usage remaining today</div>
       <div id="usageNumber" class="usage-number">3</div>
@@ -978,10 +976,10 @@
       <h3>Weekly Planner</h3>
       <p class="panel-subtitle">Your scheduled content organized by day.</p>
     </div>
-    <button class="collapse-toggle" onclick="toggleSection('plannerSection', this)">−</button>
+    <button class="collapse-toggle" onclick="toggleSection('plannerSection', this)">Show</button>
   </div>
 
-  <div id="plannerSection" class="collapsible-content">
+  <div id="plannerSection" class="collapsible-content collapsed">
     <div id="plannerView" class="planner-view">
       <div class="empty-state">No posts scheduled yet.</div>
     </div>
@@ -995,10 +993,10 @@
       <h3>Current Promotions Calendar</h3>
       <p class="panel-subtitle">Your latest generated weekly promotions.</p>
     </div>
-    <button class="collapse-toggle" onclick="toggleSection('calendarSection', this)">−</button>
+    <button class="collapse-toggle" onclick="toggleSection('calendarSection', this)">Show</button>
   </div>
 
-  <div id="calendarSection" class="collapsible-content">
+  <div id="calendarSection" class="collapsible-content collapsed">
     <div id="calendarView" class="planner-view">
       <div class="empty-state">Generate content to see your calendar.</div>
     </div>
@@ -1763,7 +1761,7 @@ function toggleSection(id, button) {
   const isHidden = section.classList.toggle("collapsed");
 
   if (button) {
-    button.textContent = isHidden ? "+" : "−";
+    button.textContent = isCollapsed ? "Show" : "Hide";
   }
 }
 
