@@ -89,16 +89,13 @@
 .planner-text {
   font-size: 14px;
   line-height: 1.5;
-}
-
-.planner-text {
   max-height: 60px;
   overflow: hidden;
   transition: all 0.2s ease;
 }
-
 .planner-card.expanded .planner-text {
   max-height: 500px;
+  overflow: visible;
 }
 
 .copy-mini {
@@ -385,6 +382,10 @@
   transition: all 0.2s ease;
 }
 
+.collapsible-content.collapsed {
+  display: none;
+}
+
     .badge {
       background: rgba(219, 234, 254, 0.96);
       color: #0f172a;
@@ -395,13 +396,7 @@
       letter-spacing: 0.03em;
     }
 
-   .content-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  align-items: start;
-}
-
+  
 .left-column {
   display: flex;
   flex-direction: column;
@@ -446,17 +441,16 @@
     }
 .button-row {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.button-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
   align-items: center;
 }
 
+.button-row .primary-btn,
+.button-row .ghost-btn {
+  min-width: 120px;
+}
 .button-row .primary-btn,
 .button-row .ghost-btn {
   flex: 0 0 auto;
