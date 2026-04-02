@@ -362,18 +362,27 @@
   margin-bottom: 12px;
 }
 
-..collapse-toggle {
-  border: 1px solid var(--border);
-  background: #121e31;
-  color: var(--text);
-  border-radius: 10px;
-  padding: 6px 12px;
+.collapse-toggle {
+  background: rgba(20, 32, 54, 0.8);
+  border: 1px solid var(--border-soft);
+  color: var(--muted-2);
+  border-radius: 999px;
+  padding: 6px 14px;
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.collapsible-content.collapsed {
-  display: none;
+.collapse-toggle:hover {
+  background: rgba(30, 45, 70, 0.9);
+  border-color: #415578;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.collapsible-content {
+  transition: all 0.2s ease;
 }
 
     .badge {
@@ -1758,7 +1767,7 @@ function toggleSection(id, button) {
   const section = document.getElementById(id);
   if (!section) return;
 
-  const isHidden = section.classList.toggle("collapsed");
+  const isCollapsed = section.classList.toggle("collapsed");
 
   if (button) {
     button.textContent = isCollapsed ? "Show" : "Hide";
