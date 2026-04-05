@@ -561,7 +561,11 @@ res.json({
 
 app.get("/posts", async (req, res) => {
   try {
+    const authUser = await getUserFromAuthHeader(req);
     const clientId = safeTrim(req.query.clientId);
+
+    const userId = authUser?.id || null;
+    const fallbackClientId = userId ? null : clientId;
 
     let query = supabase
       .from("posts")
@@ -569,8 +573,12 @@ app.get("/posts", async (req, res) => {
       .order("created_at", { ascending: false })
       .limit(20);
 
-    if (clientId) {
-      query = query.eq("client_id", clientId);
+    if (userId) {
+      query = query.eq("user_id", userId);
+    } else if (fallbackClientId) {
+      query = query.eq("client_id", fallbackClientId);
+    } else {
+      return res.status(400).json({ error: "Missing identity." });
     }
 
     const { data, error } = await query;
@@ -588,20 +596,23 @@ app.get("/posts", async (req, res) => {
 
 app.post("/schedule", async (req, res) => {
   try {
+    const authUser = await getUserFromAuthHeader(req);
     const clientId = safeTrim(req.body?.clientId);
     const postText = safeTrim(req.body?.postText);
-    const platforms = Array.isArray(req.body?.platforms)
+
+    const userId = authUser?.id || null;
+    const fallbackClientId = userId ? null : clientId;    const platforms = Array.isArray(req.body?.platforms)
   ? req.body.platforms.map((p) => safeTrim(p)).filter(Boolean)
   : [];
     const date = safeTrim(req.body?.date);
     const time = safeTrim(req.body?.time);
     const repeat = safeTrim(req.body?.repeat, "One time");
 
-    if (!clientId) {
-      return res.status(400).json({
-        error: "Missing clientId."
-      });
-    }
+if (!userId && !fallbackClientId) {
+  return res.status(400).json({
+    error: "Missing identity."
+  });
+}
 
     if (!postText) {
       return res.status(400).json({
@@ -629,9 +640,10 @@ if (hasInvalidPlatform) {
       });
     }
 
-    const scheduledRows = platforms.map((platform) => ({
+const scheduledRows = platforms.map((platform) => ({
   id: crypto.randomUUID(),
-  client_id: clientId,
+  user_id: userId,
+  client_id: fallbackClientId,
   post_text: postText,
   platform,
   date: date || null,
@@ -663,7 +675,11 @@ if (hasInvalidPlatform) {
 
 app.get("/scheduled", async (req, res) => {
   try {
+    const authUser = await getUserFromAuthHeader(req);
     const clientId = safeTrim(req.query.clientId);
+
+    const userId = authUser?.id || null;
+    const fallbackClientId = userId ? null : clientId;
 
     let query = supabase
       .from("scheduled_posts")
@@ -671,8 +687,12 @@ app.get("/scheduled", async (req, res) => {
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (clientId) {
-      query = query.eq("client_id", clientId);
+    if (userId) {
+      query = query.eq("user_id", userId);
+    } else if (fallbackClientId) {
+      query = query.eq("client_id", fallbackClientId);
+    } else {
+      return res.status(400).json({ error: "Missing identity." });
     }
 
     const { data, error } = await query;
