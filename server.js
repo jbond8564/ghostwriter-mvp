@@ -75,16 +75,17 @@ async function savePostRecord(record) {
     .from("posts")
     .insert([
       {
-        id: record.id,
-        client_id: record.clientId,
-        promotions_calendar: record.promotionsCalendar,
-        tone: record.tone,
-        status: record.status,
-        scheduled_for: record.scheduledFor,
-        posts: record.posts,
-        created_at: record.createdAt,
-        environment: record.environment
-      }
+  id: record.id,
+  user_id: record.userId,
+  client_id: record.clientId,
+  promotions_calendar: record.promotionsCalendar,
+  tone: record.tone,
+  status: record.status,
+  scheduled_for: record.scheduledFor,
+  posts: record.posts,
+  created_at: record.createdAt,
+  environment: record.environment
+}
     ])
     .select()
     .single();
@@ -96,6 +97,62 @@ async function savePostRecord(record) {
 
   return data;
 }
+
+async function getUsageByUserId(userId) {
+  const today = getTodayKey();
+  const environment = process.env.APP_ENV || "prod";
+
+  const { data, error } = await supabase
+    .from("usage")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("date", today)
+    .eq("environment", environment)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data?.count || 0;
+}
+
+async function incrementUsageByUserId(userId) {
+  const today = getTodayKey();
+  const environment = process.env.APP_ENV || "prod";
+
+  const { data, error } = await supabase
+    .from("usage")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("date", today)
+    .eq("environment", environment)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  if (!data) {
+    const { error: insertError } = await supabase
+      .from("usage")
+      .insert([
+        {
+          user_id: userId,
+          date: today,
+          count: 1,
+          environment
+        }
+      ]);
+
+    if (insertError) throw insertError;
+    return;
+  }
+
+  const { error: updateError } = await supabase
+    .from("usage")
+    .update({ count: data.count + 1 })
+    .eq("id", data.id);
+
+  if (updateError) throw updateError;
+}
+
 async function incrementUsage(clientId) {
   const today = getTodayKey();
   const environment = process.env.APP_ENV || "prod";
@@ -210,6 +267,29 @@ function parsePostsFromOutput(outputText) {
   return emptyCalendar;
 }
 
+async function getUserFromAuthHeader(req) {
+  const authHeader = req.headers.authorization || "";
+
+  if (!authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.slice(7).trim();
+
+  if (!token) {
+    return null;
+  }
+
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error) {
+    console.error("Auth token error:", error.message);
+    return null;
+  }
+
+  return data?.user || null;
+}
+
 app.get("/", (req, res) => {
   res.send("Inkova Social API is live");
 });
@@ -253,15 +333,20 @@ app.post("/feedback", async (req, res) => {
 
 app.post("/generate", async (req, res) => {
   try {
+    const authUser = await getUserFromAuthHeader(req);
     const clientId = safeTrim(req.body?.clientId);
     const environment = process.env.APP_ENV || "prod";
 
+    const userId = authUser?.id || null;
+    const fallbackClientId = userId ? null : clientId;
 
-if (!clientId) {
-  return res.status(400).json({ error: "Missing clientId" });
-}
+    if (!userId && !fallbackClientId) {
+      return res.status(400).json({ error: "Missing identity." });
+    }
 
-const currentUsage = await getUsage(clientId);
+const currentUsage = userId
+  ? await getUsageByUserId(userId)
+  : await getUsage(fallbackClientId);
 
 const isDev = process.env.APP_ENV === "dev";
 
@@ -430,7 +515,8 @@ if (!hasAnyPosts) {
 
 const record = {
   id: crypto.randomUUID(),
-  clientId,
+  userId,
+  clientId: fallbackClientId,
   promotionsCalendar,
   tone,
   status: "generated",
@@ -441,7 +527,12 @@ const record = {
 };
 
 await savePostRecord(record);
-await incrementUsage(clientId);
+
+if (userId) {
+  await incrementUsageByUserId(userId);
+} else {
+  await incrementUsage(fallbackClientId);
+}
 
 res.json({
   posts,
