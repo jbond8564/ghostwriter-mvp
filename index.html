@@ -1956,6 +1956,21 @@ function setupMobileCollapsedSections() {
 
 setupMobileCollapsedSections();
 
+async function initAuth() {
+  await refreshAuthUI();
+  await loadHistory();
+  await loadScheduled();
+}
+
+supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+  currentUser = session?.user || null;
+  await refreshAuthUI();
+  await loadHistory();
+  await loadScheduled();
+});
+
+initAuth();
+
 </script>
 </body>
 </html>
