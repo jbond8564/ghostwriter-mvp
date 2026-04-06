@@ -1079,10 +1079,21 @@
   let latestPosts = [];
   let currentUser = null;
 
-  async function getAccessToken() {
-    const { data } = await supabaseClient.auth.getSession();
-    return data.session?.access_token || null;
+ async function getAccessToken() {
+  try {
+    const sessionResult = await Promise.race([
+      supabaseClient.auth.getSession(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("getSession timeout")), 5000)
+      )
+    ]);
+
+    return sessionResult?.data?.session?.access_token || null;
+  } catch (error) {
+    console.error("getAccessToken error:", error);
+    return null;
   }
+}
 
   async function ensureProfile(user) {
     if (!user) return;
@@ -1101,69 +1112,52 @@
     }
   }
 
-  async function refreshAuthUI() {
-    const authStatus = document.getElementById("authStatus");
-    const authUserInfo = document.getElementById("authUserInfo");
+ async function refreshAuthUI() {
+  const authStatus = document.getElementById("authStatus");
+  const authUserInfo = document.getElementById("authUserInfo");
 
-    const { data, error } = await supabaseClient.auth.getUser();
+  const { data, error } = await supabaseClient.auth.getSession();
+  const user = data?.session?.user || null;
 
-    if (error || !data?.user) {
-      currentUser = null;
-      authStatus.textContent = "Not logged in.";
-      authUserInfo.textContent = "";
-      return;
-    }
-
-    currentUser = data.user;
-    authStatus.textContent = "Logged in.";
-    authUserInfo.textContent = `Signed in as ${currentUser.email}`;
-    await ensureProfile(currentUser);
+  if (error || !user) {
+    currentUser = null;
+    authStatus.textContent = "Not logged in.";
+    authUserInfo.textContent = "";
+    return;
   }
 
-  async function signUp() {
-    const email = document.getElementById("authEmail").value.trim();
-    const password = document.getElementById("authPassword").value.trim();
-    const authStatus = document.getElementById("authStatus");
-
-    if (!email || !password || password.length < 6) {
-      authStatus.textContent = "Enter a valid email and password with at least 6 characters.";
-      return;
-    }
-
-    const { error } = await supabaseClient.auth.signUp({
-      email,
-      password
-    });
-
-    if (error) {
-      authStatus.textContent = error.message;
-      return;
-    }
-
-    authStatus.textContent = "Signup successful. Check your email if confirmation is enabled.";
-    await refreshAuthUI();
-  }
+  currentUser = user;
+  authStatus.textContent = "Logged in.";
+  authUserInfo.textContent = `Signed in as ${currentUser.email}`;
+  await ensureProfile(currentUser);
+}
 
   async function logIn() {
-    const email = document.getElementById("authEmail").value.trim();
-    const password = document.getElementById("authPassword").value.trim();
-    const authStatus = document.getElementById("authStatus");
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value.trim();
+  const authStatus = document.getElementById("authStatus");
 
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) {
-      authStatus.textContent = error.message;
-      return;
-    }
-
-    authStatus.textContent = "Login successful.";
-    await refreshAuthUI();
-    await loadHistory();
-    await loadScheduled();
+  if (!email || !password) {
+    authStatus.textContent = "Enter your email and password.";
+    return;
   }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    authStatus.textContent = error.message;
+    return;
+  }
+
+  currentUser = data?.user || null;
+  authStatus.textContent = "Login successful.";
+  await refreshAuthUI();
+  await loadHistory();
+  await loadScheduled();
+}
 
   async function logOut() {
     const authStatus = document.getElementById("authStatus");
@@ -1804,9 +1798,7 @@ const response = await fetch(`${API_BASE_URL}/schedule`, {
     }
   }
 
-  updateUsageUI();
-  loadHistory();
-  loadScheduled();
+
 async function submitEmail() {
   const emailInput = document.getElementById("emailInput");
   const email = emailInput.value.trim();
@@ -1915,8 +1907,8 @@ ${navigator.userAgent}
 },
      body: JSON.stringify({
   clientId: currentUser ? null : fallbackClientId,
-  message: message.trim(),
-  type: "feature"
+  message: fullmessage.trim(),
+  type: "bug"
 })
     });
 
@@ -1957,6 +1949,7 @@ function setupMobileCollapsedSections() {
 setupMobileCollapsedSections();
 
 async function initAuth() {
+  updateUsageUI();
   await refreshAuthUI();
   await loadHistory();
   await loadScheduled();
