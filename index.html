@@ -1555,9 +1555,8 @@ async function generatePosts() {
 
   console.log("Generate response received", response.status);
 
+  const data = await response.json();
   console.log("Generate response body", data);
-
-    const data = await response.json();
 
     if (response.status === 429) {
       status.textContent = "You’ve reached today’s free limit.";
