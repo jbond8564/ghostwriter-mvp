@@ -1549,7 +1549,7 @@ async function generatePosts() {
     },
     body: JSON.stringify({
       ...payload,
-      clientId: currentUser ? null : getClientIdFallback()
+      clientId: accessToken ? null : getClientIdFallback()
     })
   });
 
@@ -1761,7 +1761,7 @@ const response = await fetch(`${API_BASE_URL}/schedule`, {
     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
   },
   body: JSON.stringify({
-    clientId: currentUser ? null : getClientIdFallback(),
+    clientId: accessToken ? null : getClientIdFallback(),
     postText: post,
     platforms: selectedPlatforms,
     date,
