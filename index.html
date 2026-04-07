@@ -1539,8 +1539,6 @@ async function generatePosts() {
   try {
   const accessToken = null;
 
-  console.log("BEFORE FETCH", payload);
-
   const response = await fetch(`${API_BASE_URL}/generate`, {
     method: "POST",
     headers: {
@@ -1553,10 +1551,8 @@ async function generatePosts() {
     })
   });
 
-  console.log("AFTER FETCH", response.status);
 
   const data = await response.json();
-  console.log("RESPONSE BODY", data);
 
     if (response.status === 429) {
       status.textContent = "You’ve reached today’s free limit.";
@@ -1874,7 +1870,9 @@ const fallbackClientId = getClientIdFallback();
   }
 }
 
- async function reportBug() {
+async function reportBug() {
+  console.log("reportBug clicked");
+
   const message = prompt(
 `Describe the bug:
 
@@ -1883,12 +1881,18 @@ What did you expect?
 Steps to reproduce?`
   );
 
+  console.log("prompt result:", message);
+
   if (!message || message.trim().length < 5) {
+    console.log("reportBug stopped: empty or too short");
     return;
   }
 
+  console.log("before access token");
   const accessToken = await getAccessToken();
-const fallbackClientId = getClientIdFallback();
+  console.log("after access token", accessToken ? "token present" : "no token");
+
+  const fallbackClientId = getClientIdFallback();
 
   const fullMessage = `
 BUG REPORT
