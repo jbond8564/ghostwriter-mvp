@@ -1539,7 +1539,7 @@ async function generatePosts() {
   try {
   const accessToken = await getAccessToken();
 
-  console.log("Sending /generate request", payload);
+  console.log("BEFORE FETCH", payload);
 
   const response = await fetch(`${API_BASE_URL}/generate`, {
     method: "POST",
@@ -1553,10 +1553,10 @@ async function generatePosts() {
     })
   });
 
-  console.log("Generate response received", response.status);
+  console.log("AFTER FETCH", response.status);
 
   const data = await response.json();
-  console.log("Generate response body", data);
+  console.log("RESPONSE BODY", data);
 
     if (response.status === 429) {
       status.textContent = "You’ve reached today’s free limit.";
