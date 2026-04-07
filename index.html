@@ -1159,7 +1159,6 @@
 
     if (error) {
       authStatus.textContent = error.message;
-      authUserInfo.textContent = "";
       return;
     }
 
@@ -1168,12 +1167,13 @@
     authStatus.textContent = "Login successful.";
     authUserInfo.textContent = `Signed in as ${currentUser.email}`;
 
-    await loadHistory();
-    await loadScheduled();
+    // ❌ COMMENT THESE OUT FOR NOW
+    // await loadHistory();
+    // await loadScheduled();
+
   } catch (err) {
     console.error("Login error:", err);
     authStatus.textContent = "Login failed.";
-    authUserInfo.textContent = "";
   }
 }
 
