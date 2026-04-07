@@ -1129,7 +1129,6 @@
   currentUser = user;
   authStatus.textContent = "Logged in.";
   authUserInfo.textContent = `Signed in as ${currentUser.email}`;
-  await ensureProfile(currentUser);
 }
 
   async function logIn() {
