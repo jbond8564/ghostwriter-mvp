@@ -1081,14 +1081,14 @@
 
  async function getAccessToken() {
   try {
-    const sessionResult = await Promise.race([
-      supabaseClient.auth.getSession(),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("getSession timeout")), 5000)
-      )
-    ]);
+    const { data, error } = await supabaseClient.auth.getSession();
 
-    return sessionResult?.data?.session?.access_token || null;
+    if (error) {
+      console.error("getSession error:", error);
+      return null;
+    }
+
+    return data?.session?.access_token || null;
   } catch (error) {
     console.error("getAccessToken error:", error);
     return null;
