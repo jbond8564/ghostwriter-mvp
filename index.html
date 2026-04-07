@@ -1152,8 +1152,10 @@
   }
 
   currentUser = data?.user || null;
-  authStatus.textContent = "Login successful.";
-  await refreshAuthUI();
+
+authStatus.textContent = "Login successful.";
+document.getElementById("authUserInfo").textContent = `Signed in as ${currentUser.email}`;
+
   await loadHistory();
   await loadScheduled();
 }
