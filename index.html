@@ -1540,7 +1540,12 @@ async function generatePosts() {
 
 const accessToken = await getAccessToken();
 
+console.log("Sending /generate request", payload);
+
 const response = await fetch(`${API_BASE_URL}/generate`, {
+
+console.log("Generate response received", response.status);
+
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -1907,7 +1912,7 @@ ${navigator.userAgent}
 },
      body: JSON.stringify({
   clientId: currentUser ? null : fallbackClientId,
-  message: fullmessage.trim(),
+  message: fullMessage.trim(),
   type: "bug"
 })
     });
