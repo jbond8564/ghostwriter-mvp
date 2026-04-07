@@ -1855,7 +1855,7 @@ const fallbackClientId = getClientIdFallback();
   ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
 },
       body: JSON.stringify({
-  clientId: currentUser ? null : fallbackClientId,
+  clientId: accessToken ? null : fallbackClientId,
   message: message.trim(),
   type: "feature"
 })
@@ -1910,7 +1910,7 @@ ${navigator.userAgent}
   ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
 },
      body: JSON.stringify({
-  clientId: currentUser ? null : fallbackClientId,
+  clientId: accessToken ? null : fallbackClientId,
   message: fullMessage.trim(),
   type: "bug"
 })
