@@ -1142,30 +1142,39 @@
   const email = document.getElementById("authEmail").value.trim();
   const password = document.getElementById("authPassword").value.trim();
   const authStatus = document.getElementById("authStatus");
+  const authUserInfo = document.getElementById("authUserInfo");
 
   if (!email || !password) {
     authStatus.textContent = "Enter your email and password.";
     return;
   }
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
+  authStatus.textContent = "Logging in...";
 
-  if (error) {
-    authStatus.textContent = error.message;
-    return;
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      authStatus.textContent = error.message;
+      authUserInfo.textContent = "";
+      return;
+    }
+
+    currentUser = data?.user || null;
+
+    authStatus.textContent = "Login successful.";
+    authUserInfo.textContent = `Signed in as ${currentUser.email}`;
+
+    await loadHistory();
+    await loadScheduled();
+  } catch (err) {
+    console.error("Login error:", err);
+    authStatus.textContent = "Login failed.";
+    authUserInfo.textContent = "";
   }
-
-  currentUser = data?.user || null;
-  await ensureProfile(currentUser);
-
-  authStatus.textContent = "Login successful.";
-  document.getElementById("authUserInfo").textContent = `Signed in as ${currentUser.email}`;
-
-  await loadHistory();
-  await loadScheduled();
 }
 
   async function logOut() {
