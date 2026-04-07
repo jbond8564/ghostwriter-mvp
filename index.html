@@ -1112,10 +1112,19 @@
     }
   }
 
- async function refreshAuthUI() {
+ async function refreshAuthUI(forceUser = null) {
   const authStatus = document.getElementById("authStatus");
   const authUserInfo = document.getElementById("authUserInfo");
 
+  // 👉 If we JUST logged in, trust that user instead of re-fetching session
+  if (forceUser) {
+    currentUser = forceUser;
+    authStatus.textContent = "Logged in.";
+    authUserInfo.textContent = `Signed in as ${currentUser.email}`;
+    return;
+  }
+
+  // 👉 Otherwise, check session like normal
   const { data, error } = await supabaseClient.auth.getSession();
   const user = data?.session?.user || null;
 
