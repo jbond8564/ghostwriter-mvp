@@ -1840,7 +1840,7 @@ async function suggestFeature() {
     return;
   }
 
-  const accessToken = await getAccessToken();
+  const accessToken = null;
 const fallbackClientId = getClientIdFallback();
 
   try {
@@ -1871,8 +1871,6 @@ const fallbackClientId = getClientIdFallback();
 }
 
 async function reportBug() {
-  console.log("reportBug clicked");
-
   const message = prompt(
 `Describe the bug:
 
@@ -1881,17 +1879,11 @@ What did you expect?
 Steps to reproduce?`
   );
 
-  console.log("prompt result:", message);
-
   if (!message || message.trim().length < 5) {
-    console.log("reportBug stopped: empty or too short");
     return;
   }
 
-  console.log("before access token");
-  const accessToken = await getAccessToken();
-  console.log("after access token", accessToken ? "token present" : "no token");
-
+  const accessToken = null;
   const fallbackClientId = getClientIdFallback();
 
   const fullMessage = `
