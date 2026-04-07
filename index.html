@@ -1537,25 +1537,26 @@ async function generatePosts() {
   latestPosts = [];
 
   try {
+  const accessToken = await getAccessToken();
 
-const accessToken = await getAccessToken();
+  console.log("Sending /generate request", payload);
 
-console.log("Sending /generate request", payload);
+  const response = await fetch(`${API_BASE_URL}/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+    },
+    body: JSON.stringify({
+      ...payload,
+      clientId: currentUser ? null : getClientIdFallback()
+    })
+  });
 
-const response = await fetch(`${API_BASE_URL}/generate`, {
+  console.log("Generate response received", response.status);
 
-console.log("Generate response received", response.status);
-
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
-  },
-  body: JSON.stringify({
-    ...payload,
-    clientId: currentUser ? null : getClientIdFallback()
-  })
-});
+  const data = await response.json();
+  console.log("Generate response body", data);
 
     const data = await response.json();
 
