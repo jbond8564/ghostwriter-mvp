@@ -1144,36 +1144,43 @@
   const authStatus = document.getElementById("authStatus");
   const authUserInfo = document.getElementById("authUserInfo");
 
+  console.log("LOGIN 1: function started");
+
   if (!email || !password) {
     authStatus.textContent = "Enter your email and password.";
     return;
   }
 
   authStatus.textContent = "Logging in...";
+  console.log("LOGIN 2: before signIn");
 
   try {
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
+    const result = await supabaseClient.auth.signInWithPassword({
       email,
       password
     });
 
+    console.log("LOGIN 3: after signIn", result);
+
+    const { data, error } = result;
+
     if (error) {
       authStatus.textContent = error.message;
+      authUserInfo.textContent = "";
+      console.log("LOGIN 4: signIn error", error);
       return;
     }
 
     currentUser = data?.user || null;
+    console.log("LOGIN 5: currentUser", currentUser);
 
     authStatus.textContent = "Login successful.";
     authUserInfo.textContent = `Signed in as ${currentUser.email}`;
-
-    // ❌ COMMENT THESE OUT FOR NOW
-    // await loadHistory();
-    // await loadScheduled();
-
+    console.log("LOGIN 6: UI updated");
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("LOGIN CATCH:", err);
     authStatus.textContent = "Login failed.";
+    authUserInfo.textContent = "";
   }
 }
 
