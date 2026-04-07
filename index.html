@@ -1116,7 +1116,6 @@
   const authStatus = document.getElementById("authStatus");
   const authUserInfo = document.getElementById("authUserInfo");
 
-  // 👉 If we JUST logged in, trust that user instead of re-fetching session
   if (forceUser) {
     currentUser = forceUser;
     authStatus.textContent = "Logged in.";
@@ -1124,7 +1123,6 @@
     return;
   }
 
-  // 👉 Otherwise, check session like normal
   const { data, error } = await supabaseClient.auth.getSession();
   const user = data?.session?.user || null;
 
@@ -1161,9 +1159,10 @@
   }
 
   currentUser = data?.user || null;
+  await ensureProfile(currentUser);
 
-authStatus.textContent = "Login successful.";
-document.getElementById("authUserInfo").textContent = `Signed in as ${currentUser.email}`;
+  authStatus.textContent = "Login successful.";
+  document.getElementById("authUserInfo").textContent = `Signed in as ${currentUser.email}`;
 
   await loadHistory();
   await loadScheduled();
